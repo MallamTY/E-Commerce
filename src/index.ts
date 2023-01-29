@@ -3,10 +3,13 @@ import express, {Request, Response, NextFunction} from 'express';
 import { MONGO_URI, configType, PORT} from './accessories/configuration';
 import connectDB from './db/dbConnect';
 import morgan from 'morgan';
+import UserRoute from './route/user.route';
 
 const app = express();
 app.use(morgan('common'));
 app.use(express.json());
+app.use('/ecommerce/v1', UserRoute)
+
 
 
 
