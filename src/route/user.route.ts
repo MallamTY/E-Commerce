@@ -1,11 +1,9 @@
 import express from "express";
-import { logIn, registerUser } from "../userController";
+import { logIn, registerUser } from "../controllers/userController";
+import { multerUploads } from "../services/multer";
 
 const router = express.Router();
 
-router.route('/register-user').post(registerUser);
-
-router.route('/login').post(logIn);
-
+router.post('/register-user', multerUploads, registerUser)
 
 export default router;

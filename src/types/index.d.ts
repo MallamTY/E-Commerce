@@ -1,3 +1,5 @@
+import DataURIParser from "datauri/parser";
+
 export {};
 
 declare global {
@@ -19,6 +21,12 @@ declare module "jsonwebtoken" {
       email: string;
       user_id: string;
       role: string
+  }
+}
+
+declare module "datauri/parser" {
+  export interface newDataURIParser extends DataURIParser {
+      content: string
   }
 }
 

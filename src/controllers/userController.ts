@@ -1,9 +1,11 @@
 import { RequestHandler } from "express";
-import User from "./model/user.model";
+import User from "../model/user.model";
 import validator from "validator";
 import bcrypt from 'bcrypt';
-import { tokenGenerator } from "./utitlity/token";
-import { generateOTP } from "./utitlity/otp";
+import { tokenGenerator } from "../utitlity/token";
+import { generateOTP } from "../utitlity/otp";
+import { uploads } from "../utitlity/cloudinary";
+import datauri from "../utitlity/dataUri";
 
 
 type returnTodo = object | null;
@@ -18,7 +20,10 @@ export const registerUser: RequestHandler = async(req, res, next) => {
         password: string;
         confirmpassword: string;
     }
-    reqbody = req.body
+
+    reqbody = req.body;
+    
+
 
     if (!(reqbody.firstname && reqbody.lastname && req.body.username && reqbody.email && reqbody.password && reqbody.confirmpassword)) {
         return res.status(406).json({
@@ -53,8 +58,13 @@ export const registerUser: RequestHandler = async(req, res, next) => {
             message: `User already exist in our database !!!!`
         })
     }
+    const cloudImage = await uploads(req,'UpdateTesting');
+    const {public_id, url, secure_url} = cloudImage;
 
-    dbUser = await User.create({...req.body, email: reqbody.email.toLowerCase()})
+    dbUser = await User.create({...req.body, email: reqbody.email.toLowerCase(), 
+        profilepicture_public_url: public_id, profilepicture_secure_url: secure_url,
+        profilepicture_url: url
+    })
     return res.status(201).json({
         status: `Success !!!!!`,
         message: `Account successfully created !!!!`,
@@ -112,6 +122,7 @@ try {
             message: `Invalid email or password !!!!!!!!!`
         })
     }
+
     let otp = generateOTP(10)
     
     const token: tokenType = tokenGenerator(userDB.id, userDB.role, '', username)

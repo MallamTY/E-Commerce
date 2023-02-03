@@ -57,10 +57,13 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
         type: String,
         requried: true
     },
-    profileImage: {
+    profilepicture_public_url: {
         type: String,
     },
-    profileImageId: {
+    profilepicture_secure_url: {
+        type: String
+    },
+    profilepicture_url: {
         type: String
     },
     companyName: {
@@ -87,7 +90,7 @@ userSchema.pre('save', async function(next) {
     this.confirmpassword = await bcrypt.hash(this.confirmpassword, salt);
     return next()
 })
-const user = mongoose.model('UserDatabase', userSchema)
+const user = mongoose.model('User', userSchema)
 export default user;
 
 
