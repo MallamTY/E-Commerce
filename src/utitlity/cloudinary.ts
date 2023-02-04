@@ -47,7 +47,7 @@ export const uploads = async (body: any, folder: any) => {
 export const multiUpload = async(body: any, folder: any) => {
     const dataUri: any = datauri(body);
    return cloudinary.v2.uploader.upload(dataUri.content, {resource_type: 'auto', 
-   use_filename: true, unique_filename: false,
+   use_filename: true, unique_filename: true,
    folder: folder}, function (err, result) {
        if(err) return err
        return result

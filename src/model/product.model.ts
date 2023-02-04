@@ -8,17 +8,20 @@ const productSchema = new  mongoose.Schema(
       required: [true, 'A product must have a name'],
       trim: true
     },
-    slug: String,
-    mainImage: {
+    main_mage_url: {
       type: String,
       required: [false, 'A product must have a main image']
     },
-    mainImageId: String,
-    images: {
+    main_image_id: {
+        type: String
+    },
+    images_url: {
       type: [String],
       required: [false, 'A product must have sub images']
     },
-    imagesId: Array,
+    images_id: {
+        type: Array
+    },
     description: {
       type: String,
       required: [false, 'A product must have a description']
@@ -29,7 +32,8 @@ const productSchema = new  mongoose.Schema(
     },
     seller: {
       type: mongoose.Types.ObjectId,
-      ref: 'User'
+      ref: 'User',
+      required: true
     },
     price: {
       type: Number,
@@ -65,7 +69,8 @@ const productSchema = new  mongoose.Schema(
     ],
     quantity: {
       type: Number,
-      default: 0
+      default: 0,
+      required: true
     },
     sold: {
       type: Number,
@@ -95,5 +100,4 @@ const productSchema = new  mongoose.Schema(
 );
 
 const Product = mongoose.model('Product', productSchema);
-
 export default Product;

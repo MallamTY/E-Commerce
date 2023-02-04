@@ -6,7 +6,6 @@ import { payloadJson } from "jsonwebtoken";
 
 const userAuthentication: RequestHandler = (req, res, next) => {
     try {
-        
         interface tokenType {
             id: string;
             email: string;

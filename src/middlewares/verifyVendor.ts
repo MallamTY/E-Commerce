@@ -1,9 +1,10 @@
 import { RequestHandler } from "express";
 
 
-export const vendorAuth: RequestHandler = (req, res, next) => {
+const vendorAuth: RequestHandler = (req, res, next) => {
     const currentUser = req.user;
-
+    
+    
     if (!currentUser.role) {
         return next(res.status(401).json({
             status: 'Failed !!!!!!!!',
@@ -21,3 +22,5 @@ export const vendorAuth: RequestHandler = (req, res, next) => {
     next();
 
 }
+
+export default vendorAuth

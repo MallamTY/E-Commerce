@@ -29,6 +29,6 @@ const filefilter: any = (req: Request, file: any, cb: CallableFunction) => {
     }
 }
 export const multerUploads = multer({ storage, fileFilter: filefilter }).single('image');
-export const multiMulterUploads = multer({storage}).array('images')
+export const multiMulterUploads = multer({storage}).any()
 
 

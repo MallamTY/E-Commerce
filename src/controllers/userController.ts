@@ -5,12 +5,13 @@ import bcrypt from 'bcrypt';
 import { tokenGenerator } from "../utitlity/token";
 import { generateOTP } from "../utitlity/otp";
 import { uploads } from "../utitlity/cloudinary";
-import datauri from "../utitlity/dataUri";
 
 
-type returnTodo = object | null;
+export type returnTodo = object | null;
 
 export const registerUser: RequestHandler = async(req, res, next) => {
+    console.log(req.body);
+    
    try {
     let reqbody: {
         firstname: string;
@@ -23,6 +24,7 @@ export const registerUser: RequestHandler = async(req, res, next) => {
 
     reqbody = req.body;
     
+
 
 
     if (!(reqbody.firstname && reqbody.lastname && req.body.username && reqbody.email && reqbody.password && reqbody.confirmpassword)) {
@@ -58,8 +60,9 @@ export const registerUser: RequestHandler = async(req, res, next) => {
             message: `User already exist in our database !!!!`
         })
     }
-    const cloudImage = await uploads(req,'UpdateTesting');
+    const cloudImage = await uploads(req,'Users');
     const {public_id, url, secure_url} = cloudImage;
+ 
 
     dbUser = await User.create({...req.body, email: reqbody.email.toLowerCase(), 
         profilepicture_public_url: public_id, profilepicture_secure_url: secure_url,
@@ -129,7 +132,8 @@ try {
     return res.status(200).json({
         status: `Success !!!!!`,
         message: `A one-time-pssword has been sent to your registered email address and phone number`,
-        otp
+        otp,
+        token
     })
     
     
@@ -139,5 +143,5 @@ try {
         message: error.message
     })
 }
-
+ 
 }
