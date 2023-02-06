@@ -2,7 +2,8 @@ import { json } from "body-parser";
 import { RequestHandler } from "express";
 
 export const  adminAuth: RequestHandler = (req, res, next) => {
-    const currentUser = req.user
+    try {
+        const currentUser = req.user
 
     if (!currentUser) {
         return next(res.status(401).json({
@@ -18,4 +19,11 @@ export const  adminAuth: RequestHandler = (req, res, next) => {
         }))
     }
     next()
+    } catch (error: any) {
+        return next(res.status(500).json({
+            status: `Failed !!!!!!!!!!!!`,
+            message: error.message
+        }))
+    }
 }
+

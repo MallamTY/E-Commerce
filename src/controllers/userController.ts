@@ -10,7 +10,6 @@ import { uploads } from "../utitlity/cloudinary";
 export type returnTodo = object | null;
 
 export const registerUser: RequestHandler = async(req, res, next) => {
-    console.log(req.body);
     
    try {
     let reqbody: {
@@ -22,7 +21,7 @@ export const registerUser: RequestHandler = async(req, res, next) => {
         confirmpassword: string;
     }
 
-    reqbody = req.body;
+    reqbody = req.body
     
 
 

@@ -1,22 +1,33 @@
 import { RequestHandler } from "express";
+import Color from "../model/color.model";
 import Product from "../model/product.model";
+import Size from "../model/size.model";
 import { multiUpload} from "../utitlity/cloudinary";
 
 type returnTodo = object | null;
+interface returnDb {
+    id: string,
+    product: [string]
+}
 export const uploadProduct: RequestHandler = async(req, res, next) => {
    try {
     
     let reqbody: {
         name: string;
-        description: string,
-        price: number
+        description: string;
+        price: number;
         quantity:number;
     }
 
-    
-   const {body: {name, description, price, quantity},
+    let color_size: {
+        colors: string;
+        sizes: string
+    }
+   const {body: {name, description, price, quantity,colors, sizes},
             user: {user_id}
     } = req;
+
+    color_size = {colors, sizes}
    reqbody = {name, description, price, quantity}
    if(!name || !description || !price ||!quantity) {
     return res.status(406).json({
@@ -53,9 +64,50 @@ export const uploadProduct: RequestHandler = async(req, res, next) => {
    const images_id: string[]= public_id.splice(1,public_id.length - 1)
    const images_url: string[]= url.splice(1, url.length - 1)
    
-   const product: returnTodo = await (await Product.create({...reqbody, main_image_id, main_mage_url, images_id, images_url, seller: user_id})).populate('seller')
-   console.log(product);
+   const product: any = await (await Product.create({...reqbody, main_image_id, main_mage_url, 
+    images_id, images_url, seller: user_id})).populate('seller')
+   const colorFormed = colors.split(',').map((color: string) => color.trim())
+   const sizeFormed = sizes.split(',').map((size:string) => size.trim())
+   const productColorsIds: Array<string> = [];
+   const productSizesIds: Array<string>= [];
+
+   await Promise.all(
+    colorFormed.map(async(color: string) => {
+        const dbColor: any = await Color.findOne({color});
+        let product_id = product.id
+        if (!dbColor) {
+            const newColor = await Color.create({product: product.id, color})
+            productColorsIds.push(newColor.id)
+        }
+        else{
+            productColorsIds.push(dbColor.id)
+            dbColor.product.push(product_id)
+            await dbColor.save()
+        }
+    })
+   );
+
+   await Promise.all(
+    sizeFormed.map(async(size: string) => {
+        const dbSize: any = await Size.findOne({size})
+        
+        if (!dbSize) {
+            const newSize = await Size.create({product: product.id, size})
+            productSizesIds.push(newSize.id)
+        }
+        else{
+            dbSize.product.push(product.id)
+            productSizesIds.push(dbSize.id)
+            await dbSize.save()
+        }
+    })
+   )
    
+   product.colors = productColorsIds;
+   product.sizes = productSizesIds;
+
+   await product.save()
+
    if (!product) {
     return  res.status(501).json({
         status: `Failed !!!!!!!!!!!!`,
