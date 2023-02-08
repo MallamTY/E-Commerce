@@ -288,9 +288,10 @@ export const IncreaseCartByOne: RequestHandler = async(req, res, next) => {
         
         const productsIndexes: any = cart.products.reduce((outputArray: Array<number>, currentProduct, index: number) => {
             if (currentProduct.product.toString() === product_id.toString()) outputArray.push(index);
-            
+        
             return outputArray;
           }, []);
+          
 
 
           if (productsIndexes === -1) {
@@ -303,8 +304,8 @@ export const IncreaseCartByOne: RequestHandler = async(req, res, next) => {
           for (const productIndex of productsIndexes) {
             const colorToString: any = cart.products[productIndex].selectedColor;
             const sizeToString: any = cart.products[productIndex].selectedSize;
-
             if(
+               
                 colorToString.toString() === colorObjId.toString() &&
                 sizeToString.toString() === sizeObjId.toString()
             ){
@@ -420,26 +421,26 @@ try {
         for (const productIndex of productIndexes) {
             const colorToString: any = cart?.products[productIndex].selectedColor;
             const sizeToString: any = cart?.products[productIndex].selectedSize;
-
+            
             if (colorToString.toString() === colorObjId.toString() &&
                 sizeToString.toString() === sizeObjId.toString()
             ) {
+                
                 const totalPrice: number = cart?.totalPrice - cart?.products[productIndex].totalProductPrice;
                 const totalQuantity = cart.totalQuantity - cart.products[productIndex].totalProductQuantity;
-                
                 cart?.products.splice(productIndex, 1);
+                
                 cart.totalPrice = totalPrice;
                 cart.totalQuantity = totalQuantity;
+                await cart.save();
+
+                return res.status(200).json({
+                    status: `Success .......`,
+                    message: `Product deleted from cart .......`,
+                    cart
+                })
             }
         }
-
-        await cart.save();
-
-        return res.status(200).json({
-            status: `Success .......`,
-            message: `Product deleted from cart .......`,
-            cart
-        })
 } catch (error: any) {
     res.status(500).json({
         status: `Failed !!!!!!!!!!!!`,
@@ -457,7 +458,9 @@ export const deleteCart: RequestHandler = async(req, res, next) => {
 
     const {user: {user_id}} = req;
 
-    const cart = await Cart.findById(user_id);
+    const cart = await Cart.findOne({customer: user_id});
+    console.log(cart);
+    
 
     if (!cart) {
         return res.status(406).json({
@@ -466,9 +469,9 @@ export const deleteCart: RequestHandler = async(req, res, next) => {
         });  
     }
 
-    await Cart.findByIdAndDelete(user_id);
+    await Cart.findOneAndDelete({customer:user_id});
 
-    return res.status(406).json({
+    return res.status(200).json({
         status: `Success !!!!!`,
         message: `Cart successfully deleted !!!`
     });  

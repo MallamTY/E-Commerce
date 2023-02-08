@@ -21,9 +21,9 @@ router.post('/add-cart', userAuth,buyerAuth, cartProduct);
 
 router.post('/decrease-cart', userAuth, buyerAuth, decreaseCartByOne);
 
-router.post('delete-cart', userAuth,buyerAuth, deleteCart);
+router.delete('/delete-cart', userAuth,buyerAuth, deleteCart);
 
-router.post('increase-carted-product', userAuth,buyerAuth, IncreaseCartByOne);
+router.post('/increase-carted-product', userAuth,buyerAuth, IncreaseCartByOne);
 
 router.get('/get-carted-product', userAuth,buyerAuth, getCartedProduct);
 
