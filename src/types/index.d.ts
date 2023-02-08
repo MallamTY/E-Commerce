@@ -1,4 +1,5 @@
 import DataURIParser from "datauri/parser";
+import { Transport, Transporter, TransportOptions } from "nodemailer";
 
 export {};
 
@@ -29,6 +30,7 @@ declare module "datauri/parser" {
       content: string
   }
 }
+
 
 
 

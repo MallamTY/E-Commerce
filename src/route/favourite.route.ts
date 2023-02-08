@@ -5,12 +5,12 @@ import { addOrRemoveProductToFavourite, checkProductFromFavourite, deleteFavouri
 
 const router = express.Router();
 
-router.post('/add-or-remove-favourite', userAuth,buyerAuth, addOrRemoveProductToFavourite);
+router.post('/add-or-remove', userAuth,buyerAuth, addOrRemoveProductToFavourite);
 
-router.delete('/delete-favourite', userAuth,buyerAuth, deleteFavourite);
+router.delete('/delete', userAuth,buyerAuth, deleteFavourite);
 
-router.get('/get-favourites', userAuth,buyerAuth, getFavourite);
+router.get('/get', userAuth,buyerAuth, getFavourite);
 
-router.get('/check-product-in-favourite', userAuth,buyerAuth, checkProductFromFavourite);
+router.get('/check-product', userAuth,buyerAuth, checkProductFromFavourite);
 
 export default router

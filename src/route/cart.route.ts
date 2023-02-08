@@ -17,17 +17,17 @@ const router: Router = express.Router();
 
 
 
-router.post('/add-cart', userAuth,buyerAuth, cartProduct);
+router.post('/add', userAuth,buyerAuth, cartProduct);
 
-router.post('/decrease-cart', userAuth, buyerAuth, decreaseCartByOne);
+router.post('/decrease-one', userAuth, buyerAuth, decreaseCartByOne);
 
-router.delete('/delete-cart', userAuth,buyerAuth, deleteCart);
+router.delete('/delete', userAuth,buyerAuth, deleteCart);
 
-router.post('/increase-carted-product', userAuth,buyerAuth, IncreaseCartByOne);
+router.post('/increase-one', userAuth,buyerAuth, IncreaseCartByOne);
 
-router.get('/get-carted-product', userAuth,buyerAuth, getCartedProduct);
+router.get('/get-product', userAuth,buyerAuth, getCartedProduct);
 
-router.delete('/delete-carted-product', userAuth,buyerAuth, deleteProductFromCart);
+router.delete('/delete-product', userAuth,buyerAuth, deleteProductFromCart);
 
 
 

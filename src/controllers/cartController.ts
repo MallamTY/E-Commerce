@@ -402,6 +402,13 @@ try {
     
     
     const cart: any = await Cart.findOne({customer: user_id});
+    if (!cart) {
+        return res.status(406).json({
+            status: `Failed !!!!!`,
+            message: `Cart is empty!!!`
+        }) 
+    }
+    
     const dbColor= await Color.findOne({color});
     const dbSize = await Size.findOne({size});
     const colorObjId = dbColor?.id;

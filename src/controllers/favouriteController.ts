@@ -91,13 +91,13 @@ try {
         } = req;
 
     const favourite = await Favourite.find({customer: user_id});
-    if (!favourite) {
+    if (favourite.length === 0) {
         return res.status(200).json({
             status: `Failed !!!!!`,
             message: `You don't have any product in your favourites list`
         }); 
     }
-
+    
     return res.status(200).json({
         status: `Success !!!!!`,
         message: `Your favourites list has successfully been obtained`,
@@ -159,11 +159,11 @@ try {
         } = req;
 
    const deletedFavourite = await Favourite.findOneAndDelete({customer: user_id});
-
+        
    if(!deletedFavourite) {
     return res.status(404).json({
         status: `Failed !!!!!`,
-        message: `COuldn't complete delete operation this time`
+        message: `Your favourite list is empty !!!`
     }); 
    }
 
