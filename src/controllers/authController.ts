@@ -3,6 +3,7 @@ import { tokenGenerator, verifyToken } from "../utitlity/token";
 import { generateOTP } from "../utitlity/otp";
 import { RequestHandler } from "express";
 import User from '../model/user.model';
+import Token from '../model/token.model'
 import { sendOTP } from '../utitlity/emailSender';
 import { JWT_SECRET } from '../accessories/configuration';
 import { JwtPayload } from 'jsonwebtoken';
@@ -61,7 +62,11 @@ try {
         })
     }
     
-    await sendOTP(userDB.email, userDB.username);
+    const otp: string = generateOTP(10);
+    const expires = new Date().getTime() + (60000 * 120)
+
+    await sendOTP(userDB.email, userDB.username, otp);
+    await Token.create({token: otp, user: userDB.id, expires, type: otp});
 
     return res.status(200).json({
         status: `Success !!!!!`,
@@ -85,10 +90,16 @@ export const verifyEmail: RequestHandler = async(req, res, next) => {
         email: string;
         user_id: string;
     }
+
+    interface dbObject {
+        isEmailVerified: boolean
+    }
+
 try {
     const {params: {token}} = req;
+    const payload: payload | JwtPayload |string | any  = verifyToken(token, JWT_SECRET);
+    const dbToken: any = await Token.findOne({user: payload.user_id})
    
-    
     if(!token) {
         return res.status(404).json({
             status: `Failed ...............`,
@@ -96,7 +107,6 @@ try {
         })
     }
 
-    const payload: payload | JwtPayload |string | any  = verifyToken(token, JWT_SECRET);
     if (!payload) {
         return res.status(404).json({
             status: `Failed ...............`,
@@ -104,15 +114,23 @@ try {
         })
     }
 
-    const {user_id, email, username} = payload;
-    const getUser = await User.findById(user_id);
-
-    if(!getUser) {
+    if (dbToken.expires < new Date()) {
         return res.status(404).json({
             status: `Failed ...............`,
-            message: `Link expired !!!!!!!!!`
+            message: `Expired link !!!!!!!!!`
+        })
+        
+    }
+    
+    const {user_id, email, username} = payload;
+    const dbUser: dbObject | any = await User.findById(user_id);
+    if (dbUser.isEmailVerified === true) {
+        return res.status(404).json({
+            status: `Failed ...............`,
+            message: `Linked already used !!!!!!!!!`
         })
     }
+    
     const verifiedUser = await User.findByIdAndUpdate({_id: user_id}, {isEmailVerified: true})
 
     return res.status(200).json({
@@ -126,13 +144,4 @@ try {
         message: error.message
     })
 }
-
-    
-
-}
-
-
-
-// `Dear ${username},
-//     To verify your email, click on this link: ${emailToken}
-//     If you did not create an account, then ignore this email.`,
+};

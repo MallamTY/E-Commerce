@@ -8,7 +8,7 @@ const tokenSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Types.ObjectId,
-      ref: 'users'
+      ref: 'User'
     },
     expires: {
       type: Date,

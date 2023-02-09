@@ -4,6 +4,7 @@ import validator from "validator";
 import { uploads } from "../utitlity/cloudinary";
 import { sendVerificationLink } from "../utitlity/emailSender";
 import { emailTokenGenerator } from "../utitlity/token";
+import Token from "../model/token.model";
 
 
 export type returnTodo = object | null;
@@ -69,6 +70,9 @@ export const registerUser: RequestHandler = async(req, res, next) => {
     })
 
     const token: string | undefined = emailTokenGenerator(dbUser.id, dbUser.email, dbUser.username);
+    
+    const expires: Date | number = new Date().getTime() + 300000;
+    await Token.create({token, user: dbUser._id, expires, type: 'Email'})
     await sendVerificationLink(dbUser.email, dbUser.username, token);
 
     return res.status(201).json({

@@ -20,13 +20,13 @@ export const tokenGenerator = (user_id: string, role: string, email?:string, use
 export const emailTokenGenerator = (user_id: string, role: string, email?:string, username?:string) => {
     let token: string = '';
     if (!email) {
-        return token = jwt.sign({user_id, username, role}, JWT_SECRET, {expiresIn: '2h'})
+        return token = jwt.sign({user_id, username, role}, JWT_SECRET)
     }
     else if(!username) { 
-        return token = jwt.sign({user_id, email, role}, JWT_SECRET, {expiresIn: '2h'})
+        return token = jwt.sign({user_id, email, role}, JWT_SECRET)
     }
     else if (!email && !username) {
-        return token = jwt.sign({user_id, role}, JWT_SECRET, {expiresIn: '2h'})
+        return token = jwt.sign({user_id, role}, JWT_SECRET)
     }
 }
 

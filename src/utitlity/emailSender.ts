@@ -9,7 +9,7 @@ import { generateOTP } from './otp';
 
 
 export const sendEmail = async(to: string,
-    subject: string, text: string
+    subject: string, html: string
     ) =>  {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -24,10 +24,10 @@ export const sendEmail = async(to: string,
             });
             
             const mailOptions = { 
-                from: `aderogbalilian@gmail.com`,
+                from: `MallamTY E-Commerce aderogbalilian@gmail.com`,
                 to,
                 subject,
-                text,
+                html,
             }
             
             return await transporter.sendMail(mailOptions)
@@ -35,23 +35,23 @@ export const sendEmail = async(to: string,
 }
 
 
-export const sendOTP = async(to: string, username: string) => {
-    const otp: string = generateOTP(10)
+export const sendOTP = async(to: string, username: string, otp: string) => {
+    const token: string = otp
     const email: string = to;
-    const text: string = `Dear ${username},
-    Your one-time-password to login to MallamTY eCommerce is: ${otp}`;
-    const subject: string = 'Login Oone-Time-Password';
+    const html: string = `Dear ${username},
+    Your one-time-password to login to MallamTY eCommerce is: <h1> ${token} </h1>`;
+    const subject: string = 'Login One-Time-Password';
 
-    await sendEmail(email, subject, text);
+    await sendEmail(email, subject, html);
 }
 
 
 export const sendVerificationLink = async(to: string, username: string, token: string | undefined) => {
-    const verificationEmailUrl = `http://localhost:7000/ecommerce/v1/auth/verify-email/${token}`;
+    const url = `http://localhost:7000/ecommerce/v1/auth/verify-email/${token}`;
     const subject: string = 'Verification Link';
-    const text: string = `Dear ${username},
-    To verify your email, click on this link: ${verificationEmailUrl}
+    const html: string = `Dear ${username},
+    To verify your email, click on this link: <a href = '${url}'>${url}</a>
     Please ignore this email if you didn't signup on MallamTY eCommerce recently`;
 
-    await sendEmail(to,subject, text)
+    await sendEmail(to,subject, html)
 }
