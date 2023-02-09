@@ -2,6 +2,8 @@ import { RequestHandler } from "express";
 import User from "../model/user.model";
 import validator from "validator";
 import { uploads } from "../utitlity/cloudinary";
+import { sendVerificationLink } from "../utitlity/emailSender";
+import { emailTokenGenerator } from "../utitlity/token";
 
 
 export type returnTodo = object | null;
@@ -48,7 +50,7 @@ export const registerUser: RequestHandler = async(req, res, next) => {
         })
     }
 
-    let dbUser: returnTodo = await User.findOne({$or: [{email: reqbody.email.toLowerCase()}, {username: reqbody.username}]});
+    let dbUser: any = await User.findOne({$or: [{email: reqbody.email.toLowerCase()}, {username: reqbody.username}]});
 
     if (dbUser) {
         return res.status(404).json({
@@ -56,6 +58,7 @@ export const registerUser: RequestHandler = async(req, res, next) => {
             message: `User already exist in our database !!!!`
         })
     }
+
     const cloudImage = await uploads(req,'Users');
     const {public_id, url, secure_url} = cloudImage;
  
@@ -64,10 +67,13 @@ export const registerUser: RequestHandler = async(req, res, next) => {
         profilepicture_public_url: public_id, profilepicture_secure_url: secure_url,
         profilepicture_url: url
     })
+
+    const token: string | undefined = emailTokenGenerator(dbUser.id, dbUser.email, dbUser.username);
+    await sendVerificationLink(dbUser.email, dbUser.username, token);
+
     return res.status(201).json({
         status: `Success !!!!!`,
-        message: `Account successfully created !!!!`,
-        user: dbUser
+        message: `A link has been sent to your email address to complete your registration !!!!`,
     })
     
    } catch (error: any) {

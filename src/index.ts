@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import routes from './route';
 
 const app = express();
-app.use(morgan('common'));
+//app.use(morgan('common'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 app.use('/ecommerce/v1', routes);
