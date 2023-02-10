@@ -4,6 +4,8 @@ import { MAIL_USERNAME, MAIL_PASSWORD,
     OAUTH_CLIENT_SECRET,
     OAUTH_REFRESH_TOKEN 
 } from '../accessories/configuration';
+import emailOTPTemplate from '../templates/emailOTP';
+import emailTemplate, { templateValues } from '../templates/emailVerification';
 import { generateOTP } from './otp';
 
 
@@ -36,10 +38,10 @@ export const sendEmail = async(to: string,
 
 
 export const sendOTP = async(to: string, username: string, otp: string) => {
-    const token: string = otp
+  
+    const otpTemplateValues: templateValues = emailOTPTemplate(otp, username);
     const email: string = to;
-    const html: string = `Dear ${username},
-    Your one-time-password to login to MallamTY eCommerce is: <h1> ${token} </h1>`;
+    const html: string = otpTemplateValues.html;
     const subject: string = 'Login One-Time-Password';
 
     await sendEmail(email, subject, html);
@@ -47,11 +49,11 @@ export const sendOTP = async(to: string, username: string, otp: string) => {
 
 
 export const sendVerificationLink = async(to: string, username: string, token: string | undefined) => {
+
     const url = `http://localhost:7000/ecommerce/v1/auth/verify-email/${token}`;
     const subject: string = 'Verification Link';
-    const html: string = `Dear ${username},
-    To verify your email, click on this link: <a href = '${url}'>${url}</a>
-    Please ignore this email if you didn't signup on MallamTY eCommerce recently`;
+    const tokenTemplateValues: templateValues = emailTemplate(url, username);
+    const html: string = tokenTemplateValues.html;
 
-    await sendEmail(to,subject, html)
+    await sendEmail(to,subject, html);
 }
