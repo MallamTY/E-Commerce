@@ -28,7 +28,7 @@ const Authentication: RequestHandler = (req, res, next) => {
             })
         }
      
-        const payload = <payloadJson>verifyToken(token, JWT_SECRET);
+        const payload = <payloadJson>verifyToken(token);
         req.user = ({...payload})
         next()
         

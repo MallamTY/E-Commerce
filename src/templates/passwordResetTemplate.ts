@@ -2,7 +2,7 @@ export interface templateValues {
     html: string;
 }
 
-const emailTemplate = function (token: string, username: string): templateValues {
+const passwordResetTemplate = function (token: string, username: string): templateValues {
     const html = `
     <!DOCTYPE html>
     <html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -12,7 +12,7 @@ const emailTemplate = function (token: string, username: string): templateValues
       <meta http-equiv="x-ua-compatible" content="ie=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
-      <title>Verification Link</title>
+      <title>Reset Password</title>
       <link
         href="https://fonts.googleapis.com/css?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700"
         rel="stylesheet" media="screen">
@@ -66,7 +66,7 @@ const emailTemplate = function (token: string, username: string): templateValues
     <body
       style="margin: 0; padding: 0; width: 100%; word-break: break-word; -webkit-font-smoothing: antialiased; --bg-opacity: 1; background-color: #eceff1;">
       <div style="display: none;">A request to sigup on MallamTY E-COmmercef was made </div>
-      <div role="article" aria-roledescription="email" aria-label="Verify your email address" lang="en">
+      <div role="article" aria-roledescription="email" aria-label="Reset your Password" lang="en">
         <table style="font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif; width: 100%;" width="100%"
           cellpadding="0" cellspacing="0" role="presentation">
           <tr>
@@ -93,7 +93,7 @@ const emailTemplate = function (token: string, username: string): templateValues
                            align="left">
                           <p style="font-weight: 600; font-size: 18px; margin-bottom: 0;">Dear ${username},</p>
                           <p style="margin: 0 0 24px;">
-                            <br> A request to sign up on MallamTY E-Commerce was made, click on the verification link to verify your account
+                            <br> A request to reset your password on MallamTY E-Commerce was made, click on the link below to reset your password.
                           </p>
                           <lable style="display: block; font-size: 24px; line-height: 100%; margin-bottom: 24px; --text-opacity: 1; color: #000000; text-decoration: none;">${token}</lable>
                           <table style="font-family: 'Montserrat',Arial,sans-serif;" cellpadding="0" cellspacing="0"
@@ -145,4 +145,4 @@ const emailTemplate = function (token: string, username: string): templateValues
     };
 };
 
-export default emailTemplate;
+export default passwordResetTemplate;

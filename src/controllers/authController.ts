@@ -1,13 +1,12 @@
 import bcrypt from 'bcrypt';
-import { tokenGenerator, verifyToken } from "../utitlity/token";
+import { tokenGenerator, verifyToken, emailTokenGenerator } from "../utitlity/token";
 import { generateOTP } from "../utitlity/otp";
 import { RequestHandler } from "express";
 import User from '../model/user.model';
 import Token from '../model/token.model'
-import { sendOTP } from '../utitlity/emailSender';
-import { JWT_SECRET } from '../accessories/configuration';
-import { JwtPayload } from 'jsonwebtoken';
-import {ObjectId} from 'mongoose';
+import { sendEmail, sendOTP, sendResetPasswordLink } from '../utitlity/emailSender';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import validator from 'validator';
 
 
 
@@ -97,7 +96,7 @@ export const verifyEmail: RequestHandler = async(req, res, next) => {
 
 try {
     const {params: {token}} = req;
-    const payload: payload | JwtPayload |string | any  = verifyToken(token, JWT_SECRET);
+    const payload: payload | JwtPayload |string | any  = verifyToken(token);
     const dbToken: any = await Token.findOne({user: payload.user_id})
    
     if(!token) {
@@ -230,5 +229,99 @@ export const resendOTP: RequestHandler = async(req, res, next) => {
             status: `Failed !!!!!!!!!!!!`,
             message: error.message
         }))
+    }
+}
+
+export const forgetPassword: RequestHandler = async(req, res, next) => {
+
+    try {
+        const {body: {email, username}} = req;
+        if(!validator.isEmail(email)) {
+            return res.status(406).json({
+                status: `Failed !!!!!!!!!!!!`,
+                message: `Invalid email address !!!`
+            })
+        }
+
+        const dbUser = await User.findOne({$or: [{email: email. toLowerCase()}, {username}]});
+
+        if (!dbUser) {
+            return res.status(406).json({
+                status: `Failed !!!!!!!!!!!!`,
+                message: `User not found !!!`
+            })
+        }
+
+        const token = emailTokenGenerator(dbUser.id, dbUser.role, dbUser.email);
+
+        if (!token) {
+            return res.status(500).json({
+                status: `Failed !!!!!!!!!!!!`,
+                message: `Unable to generate token !!!`
+            })
+        }
+
+        sendResetPasswordLink(dbUser.email, dbUser.username, token)
+
+        return res.status(200).json({
+            status: `Success ....`,
+            message: `A password rest link has been sent to ${dbUser.email}`
+        });
+
+    } catch (error: any) {
+        return res.status(406).json({
+            status: `Failed !!!!!!!!!!!!`,
+            message: error.message
+        })
+    }
+}
+
+export const resetPassword: RequestHandler = async(req, res, next) => {
+
+    try {
+
+
+            const {body: {newPassword, confirmNewPassword},
+            params: {token}
+                                } = req;
+    const payload: any = verifyToken(token)
+    const user_id = payload.user_id;
+
+    
+    if (!validator.isStrongPassword(newPassword || !validator.isStrongPassword(confirmNewPassword))) {
+        return res.status(406).json({
+            status: `Failed !!!!!!!!!!!!`,
+            message: `Password not strong enough !!!`
+        });
+    }
+    if (newPassword !== confirmNewPassword) {
+        return res.status(406).json({
+            status: `Failed !!!!!!!!!!!!`,
+            message: `Password not match`
+        });
+    }
+    
+    const updateUser = await User.findById(user_id);
+   
+    if (!updateUser) {
+        return res.status(406).json({
+            status: `Failed !!!!!!!!!!!!`,
+            message: `Unabale to change your password this time !!!`
+        });
+    }
+
+    updateUser.password = newPassword;
+    updateUser.confirmpassword = confirmNewPassword;
+    updateUser.save();
+
+    return res.status(200).json({
+        status: `Success !!!`,
+        message: `Password reset successful ...`
+    })
+    } catch (error: any) {
+        return res.status(500).json({
+            status: `Failed !!!`,
+            message: error.message
+        })
     }
 }

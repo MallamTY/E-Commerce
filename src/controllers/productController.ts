@@ -114,7 +114,7 @@ export const uploadProduct: RequestHandler = async(req, res, next) => {
         message: `Unable to upload your product !!!!!!!!!`
     })
    }
-   return res.status(501).json({
+   return res.status(200).json({
     status: `Success ...............`,
     message: `Product uploaded`,
     product

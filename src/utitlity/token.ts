@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import { token } from "morgan";
 import { JWT_SECRET } from "../accessories/configuration";
 
 
@@ -31,7 +30,7 @@ export const emailTokenGenerator = (user_id: string, role: string, email?:string
 }
 
 
-export const verifyToken = (token: string, JWT_SECRET: string) => {
+export const verifyToken = (token: string) => {
     const decodedToken = jwt.verify(token, JWT_SECRET);
     return decodedToken;
 }

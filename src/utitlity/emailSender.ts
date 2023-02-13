@@ -6,6 +6,7 @@ import { MAIL_USERNAME, MAIL_PASSWORD,
 } from '../accessories/configuration';
 import emailOTPTemplate from '../templates/emailOTP';
 import emailTemplate, { templateValues } from '../templates/emailVerification';
+import passwordResetTemplate from '../templates/passwordResetTemplate';
 import { generateOTP } from './otp';
 
 
@@ -53,6 +54,16 @@ export const sendVerificationLink = async(to: string, username: string, token: s
     const url = `http://localhost:7000/ecommerce/v1/auth/verify-email/${token}`;
     const subject: string = 'Verification Link';
     const tokenTemplateValues: templateValues = emailTemplate(url, username);
+    const html: string = tokenTemplateValues.html;
+
+    await sendEmail(to,subject, html);
+}
+
+export const sendResetPasswordLink = async(to: string, username: string, token: string | undefined) => {
+
+    const url = `http://localhost:7000/ecommerce/v1/auth/reset-password/${token}`;
+    const subject: string = 'Reset Password';
+    const tokenTemplateValues: templateValues = passwordResetTemplate(url, username);
     const html: string = tokenTemplateValues.html;
 
     await sendEmail(to,subject, html);
