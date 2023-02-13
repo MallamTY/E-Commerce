@@ -10,6 +10,11 @@ const tokenSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: 'User'
     },
+    valid: {
+      type: Boolean,
+      required: true,
+      default: true
+    },
     expires: {
       type: Date,
       required: true

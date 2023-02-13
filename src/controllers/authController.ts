@@ -7,7 +7,7 @@ import Token from '../model/token.model'
 import { sendOTP } from '../utitlity/emailSender';
 import { JWT_SECRET } from '../accessories/configuration';
 import { JwtPayload } from 'jsonwebtoken';
-//import MailService from '../utitlity/otpSender';
+import {ObjectId} from 'mongoose';
 
 
 
@@ -145,3 +145,90 @@ try {
     })
 }
 };
+
+
+export const verifyOTP: RequestHandler = async(req, res, next) => {
+
+    try {
+
+        const {params: {user_id},
+                body: {otp}
+                                } = req;
+        if (!user_id) {
+            return res.status(404).json({
+                status: `Failed ...............`,
+                message: `Invalid credentials !!!!!!!!!`
+            })
+        }
+    
+        const dbToken = await Token.findOne({user: user_id});
+    
+        if (dbToken?.token === otp) {
+            if (dbToken?.valid) {
+                const currentTIme = new Date();
+                if (dbToken.expires > currentTIme) {
+                    const loginUser: any = await User.findById(user_id);
+                    const token = tokenGenerator(user_id, loginUser.role, loginUser.email, loginUser.username);
+                    if (token) {
+                        dbToken.valid = false;
+                        dbToken.save();
+                        return next(res.status(200).json({
+                            status: `Success .....`,
+                            message: `Login successful ..........`,
+                            token
+                        }))
+                    }
+                    return next(res.status(404).json({
+                        status: `Failed !!!`,
+                        message: `Unable to generate login token !!!`
+                    }))
+                }
+                return next(res.status(404).json({
+                    status: `Failed !!!`,
+                    message: `Your one-time-password has expired !!!`,
+                }))
+            }
+            return next(res.status(404).json({
+                status: `Failed !!!`,
+                message: `Invalid one-time-password !!!`,
+            }))
+        }
+        return next(res.status(404).json({
+            status: `Failed !!!`,
+            message: `Invalid one-time-password !!!`,
+        }))
+    } catch (error: any) {
+        return next(res.status(500).json({
+            status: `Failed !!!!!!!!!!!!`,
+            message: error.message
+        }))
+    }
+
+}
+
+export const resendOTP: RequestHandler = async(req, res, next) => {
+    try {
+        const {params: {user_id},
+                        } = req;
+        
+        const userDB: any = await User.findById(user_id)
+        const otp = generateOTP(10);
+
+        const expires = new Date().getTime() + (60000 * 120)
+
+        await sendOTP(userDB.email, userDB.username, otp);
+        await Token.updateMany({user: user_id}, {$set: {"valid": false}});
+        await Token.create({token: otp, user: userDB.id, expires, type: otp});
+        
+        return res.status(200).json({
+            status: `Success !!!!!`,
+            message: `A one-time-pssword has been resent to your registered email address ...`
+        });
+
+    } catch (error: any) {
+        return next(res.status(500).json({
+            status: `Failed !!!!!!!!!!!!`,
+            message: error.message
+        }))
+    }
+}

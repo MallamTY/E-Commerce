@@ -44,7 +44,7 @@ export const sendOTP = async(to: string, username: string, otp: string) => {
     const html: string = otpTemplateValues.html;
     const subject: string = 'Login One-Time-Password';
 
-    await sendEmail(email, subject, html);
+    const sent = await sendEmail(email, subject, html);
 }
 
 
