@@ -17,7 +17,9 @@ const tokenSchema = new mongoose.Schema(
     },
     expires: {
       type: Date,
-      required: true
+      required: true,
+      default: Date.now(),
+      index: {expires: '1m'}
     },
     type: {
       type: String,

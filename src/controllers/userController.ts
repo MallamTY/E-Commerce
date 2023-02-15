@@ -71,18 +71,18 @@ export const registerUser: RequestHandler = async(req, res, next) => {
 
     const token: string | undefined = emailTokenGenerator(dbUser.id, dbUser.email, dbUser.username);
     
-    const expires: Date | number = new Date().getTime() + 300000;
-    await Token.create({token, user: dbUser._id, expires, type: 'Email'})
+    const expires: Date | number =  Date.now() + 300000;
+    await Token.create({token, user: dbUser._id, expires, type: 'Verification Link'})
     await sendVerificationLink(dbUser.email, dbUser.username, token);
 
     return res.status(201).json({
-        status: `Success !!!!!`,
-        message: `A link has been sent to your email address to complete your registration !!!!`,
+        status: `success`,
+        message: `An email confirmation lin has been sent to your email address !!!!`,
     })
     
    } catch (error: any) {
     res.status(500).json({
-        status: `Failed !!!!!!!!!!!!`,
+        status: `failed `,
         error: error.message
     })
    }
