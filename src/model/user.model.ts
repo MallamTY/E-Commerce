@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { nextTick } from "process";
+import { NextFunction } from "express";
 
 const userSchema: mongoose.Schema = new mongoose.Schema({
     firstname: {
@@ -90,7 +91,9 @@ userSchema.pre('save', async function(next) {
     this.confirmpassword = await bcrypt.hash(this.confirmpassword, salt);
     return next()
 })
-const user = mongoose.model('User', userSchema)
+
+const user = mongoose.model('User', userSchema);
+
 export default user;
 
 

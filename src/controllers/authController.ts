@@ -4,9 +4,10 @@ import { generateOTP } from "../utitlity/otp";
 import { RequestHandler } from "express";
 import User from '../model/user.model';
 import Token from '../model/token.model'
-import { sendOTP, sendResetPasswordLink } from '../utitlity/emailSender';
+import { sendOTP, sendResetPasswordLink, sendVerificationLink } from '../utitlity/emailSender';
 import { JwtPayload } from 'jsonwebtoken';
 import validator from 'validator';
+import { JWT_SECRET } from '../accessories/configuration';
 
 
 
@@ -70,7 +71,8 @@ export const logIn: RequestHandler = async(req, res, next) => {
 
         return res.status(200).json({
             status: `success`,
-            message: `A one-time-password has been sent to your registered email address ...`
+            message: `A one-time-password has been sent to your registered email address ...`,
+            otp
         })
         
     
@@ -146,7 +148,28 @@ export const verifyEmail: RequestHandler = async(req, res, next) => {
 }
 };
 
+export const resendEmailVerificiationLink:RequestHandler = async(req, res, next) => {
+    try {
+        const {params: {token}} = req;
+        const payload: any = verifyToken(token);
 
+        const newToken: string | undefined = emailTokenGenerator(payload.id, payload.email, payload.username);
+        const expires: Date | number =  Date.now() + 300000;
+        await Token.create({token, user: payload.id, expires, type: 'Verification Link'})
+        await sendVerificationLink(payload.email, payload.username, newToken);
+
+        return res.status(200).json({
+            status: `success`,
+            message: `Verification link has been resent to ${payload.email}`
+        })
+    
+    } catch (error: any) {
+        return res.status(500).json({
+            status: `failed`,
+            message: error.message
+        }) 
+    }
+}
 export const verifyOTP: RequestHandler = async(req, res, next) => {
 
     try {
@@ -238,7 +261,8 @@ export const resendOTP: RequestHandler = async(req, res, next) => {
         
         return res.status(200).json({
             status: `success`,
-            message: `A one-time-pssword has been resent to your registered email address ...`
+            message: `A one-time-pssword has been resent to your registered email address ...`,
+            otp
         });
 
     } catch (error: any) {

@@ -34,7 +34,8 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                 message: `Size must be specified !!!`
             }) 
         }
-        
+
+         
         if(!color) {
             return res.status(406).json({
                 status: `Failed !!!!!`,
@@ -47,84 +48,154 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
         const colorObjId = dbColor?.id; 
         const sizeObjId = dbSize?.id;
         const product: any = await Product.findById(product_id);
-         
+
         let price: number = product.price;
+
         if (cart) {
-            
-            
-            const index = cart.products.findIndex((value: any) => 
-            value.product.toString() === product_id.toString());
-            
-            console.log(index);
-            
-            
-            if (index !== -1 && quantity <= 0) {
-                cart.products.splice(index, 1)
+            if (cart.products.length > 0) {
+    
+                for(const product of cart.products) {
+                    // console.log(product.product.toString() === product_id.toString() &&
+                    // product.selectedColor.toString() !== colorObjId.toString()
+                  
+                    if(product.product.toString() === product_id.toString() &&
+                    product.selectedColor.toString() !== colorObjId.toString() &&
+                    product.selectedSize.toString() !== sizeObjId.toString()) {
+                        cart.products.push({
+                            product: product_id,
+                            selectedColor: dbColor?.id,
+                            selectedSize: dbSize?.id,
+                            totalProductQuantity: quantity,
+                            totalProductPrice: price * quantity
+                        })
+                        cart.totalQuantity += quantity;
+                        cart.totalPrice += price * quantity;
+                        await cart.save();
+
+                        return res.status(201).json({
+                            status: `Success ...............`,
+                            message: `product added to your cart`,
+                            cart
+                        })
+                        
+                    }
+
+                    else if(product.product.toString() === product_id.toString() &&
+                    product.selectedColor.toString() === colorObjId.toString() &&
+                    product.selectedSize.toString() !== sizeObjId.toString()) {
+                        cart.products.push({
+                            product: product_id,
+                            selectedColor: dbColor?.id,
+                            selectedSize: dbSize?.id,
+                            totalProductQuantity: quantity,
+                            totalProductPrice: price * quantity
+                        })
+                        cart.totalQuantity += quantity;
+                        cart.totalPrice += price * quantity;
+                        await cart.save();
+                        return res.status(201).json({
+                            status: `Success ...............`,
+                            message: `product added to your cart`,
+                            cart
+                        })
+                        
+                    }
+                    else if(product.product.toString() === product_id.toString() &&
+                    product.selectedSize.toString() !== sizeObjId.toString() &&
+                    product.selectedColor.toString() !== colorObjId.toString()) {
+                        cart.products.push({
+                            product: product_id,
+                            selectedColor: dbColor?.id,
+                            selectedSize: dbSize?.id,
+                            totalProductQuantity: quantity,
+                            totalProductPrice: price * quantity
+                        })
+                        cart.totalQuantity += quantity;
+                        cart.totalPrice += price * quantity;
+    
+                        await cart.save();
+                        
+                        return res.status(201).json({
+                            status: `Success ...............`,
+                            message: `product added to your cart`,
+                            cart
+                        })
+                    }
+                    else if(product.product.toString() === product_id.toString() &&
+                    product.selectedSize.toString() === sizeObjId.toString() &&
+                    product.selectedColor.toString() !== colorObjId.toString()) {
+                        cart.products.push({
+                            product: product_id,
+                            selectedColor: dbColor?.id,
+                            selectedSize: dbSize?.id,
+                            totalProductQuantity: quantity,
+                            totalProductPrice: price * quantity
+                        })
+                        cart.totalQuantity += quantity;
+                        cart.totalPrice += price * quantity;
+    
+                        await cart.save();
+                        
+                        return res.status(201).json({
+                            status: `Success ...............`,
+                            message: `product added to your cart`,
+                            cart
+                        })
+                    }
+                    else if(product.product.toString() === product_id.toString() &&
+                    product.selectedSize.toString() !== sizeObjId.toString() &&
+                    product.selectedColor.toString() !== colorObjId.toString()) {
+                        cart.products.push({
+                            product: product_id,
+                            selectedColor: dbColor?.id,
+                            selectedSize: dbSize?.id,
+                            totalProductQuantity: quantity,
+                            totalProductPrice: price * quantity
+                        })
+                        cart.totalQuantity += quantity;
+                        cart.totalPrice += price * quantity;
+    
+                        await cart.save();
+                        
+                        return res.status(201).json({
+                            status: `Success ...............`,
+                            message: `product added to your cart`,
+                            cart
+                        })
+                    }
             }
-            else if (index !== -1 && cart.products[index].selectedColor.toString()
-                === colorObjId.toString() && cart.products[index].selectedSize.toString() === sizeObjId.toString()
-            ) {
-                
-                cart.products[index].totalProductQuantity += quantity;
-                cart.products[index].totalProductPrice += price * quantity
-                cart.totalQuantity += quantity;
-                cart.totalPrice += price * quantity;
             }
-            else if(index !== -1 && quantity > 0) {
-                
-                cart.products.push({
+            
+        }
+        else{
+            
+            const newCart = await Cart.create({
+                customer: user_id,
+                products:[{
                     product: product_id,
                     selectedColor: dbColor?.id,
                     selectedSize: dbSize?.id,
                     totalProductQuantity: quantity,
                     totalProductPrice: price * quantity
-                })
-                cart.totalQuantity += quantity;
-                cart.totalPrice += price * quantity;
-            }
-            else {
+                }],
+                totalQuantity: quantity,
+                totalPrice: price * quantity,
+            })
+            
+            if (!newCart) {
                 return res.status(400).json({
                     status: `Failed !!!`,
-                    message: `Bad request !!!`
+                    message: `Error adding cart !!!`
                 })
             }
-
-            cart.save();
-
             return res.status(201).json({
                 status: `Success ...............`,
                 message: `product added to your cart`,
-                cart
-            })
+                cart: newCart
+            });
+        }
 
-        };
-
-    const newCart = await Cart.create({
-        customer: user_id,
-        products:[{
-            product: product_id,
-            selectedColor: dbColor?.id,
-            selectedSize: dbSize?.id,
-            totalProductQuantity: quantity,
-            totalProductPrice: price * quantity
-        }],
-        totalQuantity: quantity,
-        totalPrice: price * quantity,
-    })
-    
-    if (!newCart) {
-        return res.status(400).json({
-            status: `Failed !!!`,
-            message: `Error adding cart !!!`
-        })
-    }
-    return res.status(201).json({
-        status: `Success ...............`,
-        message: `product added to your cart`,
-        cart: newCart
-    })
-    
-    } catch (error:any) {
+    } catch (error: any) {
         res.status(500).json({
             status: `Failed !!!!!!!!!!!!`,
             message: error.message
@@ -155,12 +226,12 @@ export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
         
         if(!color) {
             return res.status(406).json({
-                status: `Failed !!!!!`,
+                status: `failed`,
                 message: `Color must be specified !!!`
             }) 
         }
         
-        const cart = await Cart.findOne({customer: user_id});
+        const cart: any = await Cart.findOne({customer: user_id});
         const dbColor = await Color.findOne({color});
         const dbSize = await Size.findOne({size});
         const colorObjId = dbColor?.id; 
@@ -171,70 +242,129 @@ export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
 
         if(!cart) {
             return res.status(406).json({
-                status: `Failed !!!!!`,
+                status: `failed!`,
                 message: `Cart is empty !!!`
+            }) 
+        }
+
+        if(cart.products.length === 1 && cart.totalQuantity === 1 &&
+            cart.products[0].selectedSize.toString() === sizeObjId.toString() &&
+            cart.products[0].selectedColor.toString() === colorObjId.toString()) {
+            await Cart.findOneAndDelete({customer: user_id})
+            return res.status(406).json({
+                status: `success`,
+                message: `Cart is now empty !!!`
+            }) 
+        }
+
+        else if(cart.products.length === 1 && cart.totalQuantity === 1 &&
+            cart.products[0].selectedSize.toString() !== sizeObjId.toString() ||
+            cart.products[0].selectedColor.toString() !== colorObjId.toString()) {
+            return res.status(404).json({
+                status: `failed`,
+                message: `Bad request !!!`
             }) 
         }
         
         
-        const productsIndexes: any = cart.products.reduce((outputArray: Array<number>, currentProduct, index: number) => {
-            if (currentProduct.product.toString() === product_id.toString()) outputArray.push(index);
+        // const productsIndexes: any = cart.products.reduce((outputArray: Array<number>, currentProduct, index: number) => {
+        //     if (currentProduct.product.toString() === product_id.toString()) outputArray.push(index);
             
-            return outputArray;
-          }, []);
+        //     return outputArray;
+        //   }, []);
 
 
-          if (productsIndexes === -1) {
-            return res.status(406).json({
-                status: `Failed !!!!!`,
-                message: `${product?.name} has not been carted`
-            }) 
-          };
+        //   if (productsIndexes === -1) {
+        //     return res.status(406).json({
+        //         status: `Failed !!!!!`,
+        //         message: `${product?.name} has not been carted`
+        //     }) 
+        //   };
 
-          for (const productIndex of productsIndexes) {
-            const colorToString: any = cart.products[productIndex].selectedColor;
-            const sizeToString: any = cart.products[productIndex].selectedSize;
-            if (
-                cart.products[productIndex].totalProductQuantity === 1 && 
-                colorToString.toString() === colorObjId.toString() &&
-                sizeToString.toString() === sizeObjId.toString()
-              ) {
-                cart.products.splice(productIndex, 1);
-                cart.totalQuantity -= 1;
-                cart.totalPrice -= price;
+        //   for (const productIndex of productsIndexes) {
+        //     const colorToString: any = cart.products[productIndex].selectedColor;
+        //     const sizeToString: any = cart.products[productIndex].selectedSize;
+        //     if (
+        //         cart.products[productIndex].totalProductQuantity === 1 && 
+        //         colorToString.toString() === colorObjId.toString() &&
+        //         sizeToString.toString() === sizeObjId.toString()
+        //       ) {
+        //         cart.products.splice(productIndex, 1);
+        //         cart.totalQuantity -= 1;
+        //         cart.totalPrice -= price;
+        //     }
+        else {
+            for(const product of cart.products){
+                if(product.product.toString() === product_id.toString() &&
+                product.totalProductQuantity === 1 &&
+                (product?.selectedColor?.toString() === colorObjId.toString() ||
+                product?.selectedSize?.toString() === sizeObjId.toString())) {
+                    const index = cart.products.indexOf(product);
+                    cart.products.splice(index, 1);
+                    cart.totalQuantity -= 1;
+                    cart.totalPrice -= price;
+                    await cart.save();
+    
+                    return res.status(200).json({
+                    status: `success`,
+                    message: `Cart has been reduced by one !!!`,
+                    cart
+                }) 
             }
-            else if(
-                colorToString.toString() === colorObjId.toString() &&
-                sizeToString.toString() === sizeObjId.toString()
-            ){
-                const updatedProductTotalQuantity =
-                cart.products[productIndex].totalProductQuantity - 1;
-                const updatedProductTotalPrice =
-                cart.products[productIndex].totalProductPrice - price;
-                const updatedCartTotalQuantity = cart.totalQuantity - 1;
-                const updatedCartTotalPrice = cart.totalPrice - price;
-
-                cart.products[productIndex].totalProductQuantity =
-                updatedProductTotalQuantity;
-                cart.products[productIndex].totalProductPrice = updatedProductTotalPrice;
-                cart.totalQuantity = updatedCartTotalQuantity;
-                cart.totalPrice = updatedCartTotalPrice;
-
+    
+                else if(product.product.toString() === product_id.toString() &&
+                product.totalProductQuantity !== 1 &&
+                (product?.selectedColor?.toString() === colorObjId.toString() ||
+                product?.selectedSize?.toString() === sizeObjId.toString())) {
+                    
+                    product.totalProductPrice -= price;
+                    product.totalProductQuantity -= 1
+                    cart.totalQuantity -= 1;
+                    cart.totalPrice -= price;
+                    await cart.save();
+    
+                    return res.status(200).json({
+                    status: `success`,
+                    message: `Cart has been reduced by one !!!`,
+                    cart
+                }) 
             }
             }
+        }
+   
+
+            // else if(
+            //     colorToString.toString() === colorObjId.toString() &&
+            //     sizeToString.toString() === sizeObjId.toString()
+            // ){
+            //     const updatedProductTotalQuantity =
+            //     cart.products[productIndex].totalProductQuantity - 1;
+            //     const updatedProductTotalPrice =
+            //     cart.products[productIndex].totalProductPrice - price;
+            //     const updatedCartTotalQuantity = cart.totalQuantity - 1;
+            //     const updatedCartTotalPrice = cart.totalPrice - price;
+
+            //     cart.products[productIndex].totalProductQuantity =
+            //     updatedProductTotalQuantity;
+            //     cart.products[productIndex].totalProductPrice = updatedProductTotalPrice;
+            //     cart.totalQuantity = updatedCartTotalQuantity;
+            //     cart.totalPrice = updatedCartTotalPrice;
+
+            // }
+            // }
 
 
-            const updatedCart = await cart.save();
+            // const updatedCart = await cart.save();
 
-            return res.status(200).json({
-                status: `success !!!!!`,
-                message: `Cart has been reduced by one !!!`,
-                cart: updatedCart
-            }) 
+            // return res.status(200).json({
+            //     status: `success !!!!!`,
+            //     message: `Cart has been reduced by one !!!`,
+            //     cart: updatedCart
+            // }) 
 
     } catch (error: any) {
         res.status(500).json({
-            status: `Failed !!!!!!!!!!!!`,
+            status: `failed`,
             message: error.message
         })
     }
@@ -466,7 +596,6 @@ export const deleteCart: RequestHandler = async(req, res, next) => {
     const {user: {user_id}} = req;
 
     const cart = await Cart.findOne({customer: user_id});
-    console.log(cart);
     
 
     if (!cart) {

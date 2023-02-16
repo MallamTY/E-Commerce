@@ -23,9 +23,6 @@ export const registerUser: RequestHandler = async(req, res, next) => {
 
     reqbody = req.body
     
-
-
-
     if (!(reqbody.firstname && reqbody.lastname && req.body.username && reqbody.email && reqbody.password && reqbody.confirmpassword)) {
         return res.status(406).json({
             status: `Failed !!!!!`,

@@ -7,6 +7,6 @@ import { multerUploads, multiMulterUploads } from "../services/multer";
 
 const router = express.Router();
 
-router.post('/uploadproduct', userAuth ,vendorAuth, multiMulterUploads, uploadProduct)
+router.post('/upload', userAuth ,vendorAuth, multiMulterUploads, uploadProduct)
 
 export default router; 

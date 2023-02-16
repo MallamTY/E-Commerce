@@ -23,7 +23,7 @@ export const uploadProduct: RequestHandler = async(req, res, next) => {
         colors: string;
         sizes: string
     }
-   const {body: {name, description, price, quantity,colors, sizes},
+   const {body: {name, description, price, quantity,colors, sizes, devliveryfee},
             user: {user_id}
     } = req;
 
