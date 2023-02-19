@@ -1,8 +1,7 @@
 import { RequestHandler } from "express";
-import Color from "../model/color.model";
-import Product from "../model/product.model";
-import Size from "../model/size.model";
+import Variation from "../model/variation.model";
 import { multiUpload} from "../utitlity/cloudinary";
+import Product from "../model/product.model";
 
 type returnTodo = object | null;
 interface returnDb {
@@ -17,18 +16,14 @@ export const uploadProduct: RequestHandler = async(req, res, next) => {
         description: string;
         price: number;
         quantity:number;
+        deliveryfee: number
     }
 
-    let color_size: {
-        colors: string;
-        sizes: string
-    }
-   const {body: {name, description, price, quantity,colors, sizes, devliveryfee},
+   const {body: {name, description, price, quantity, variations, deliveryfee},
             user: {user_id}
     } = req;
 
-    color_size = {colors, sizes}
-   reqbody = {name, description, price, quantity}
+   reqbody = {name, description, price, quantity, deliveryfee}
    if(!name || !description || !price ||!quantity) {
     return res.status(406).json({
         status: `Failed !!!!!`,
@@ -59,70 +54,54 @@ export const uploadProduct: RequestHandler = async(req, res, next) => {
         url.push(prodImage.url);
         
    }
+   
    const main_mage_url: string = url[0];
    const main_image_id: string= public_id[0];
    const images_id: string[]= public_id.splice(1,public_id.length - 1)
    const images_url: string[]= url.splice(1, url.length - 1)
    
    const product: any = await (await Product.create({...reqbody, main_image_id, main_mage_url, 
-    images_id, images_url, seller: user_id})).populate('seller')
-   const colorFormed = colors.split(',').map((color: string) => color.trim())
-   const sizeFormed = sizes.split(',').map((size:string) => size.trim())
-   const productColorsIds: Array<string> = [];
-   const productSizesIds: Array<string>= [];
+    images_id, images_url, seller: user_id})).populate('seller');
 
-   await Promise.all(
-    colorFormed.map(async(color: string) => {
-        const dbColor: any = await Color.findOne({color});
-        let product_id = product.id
-        if (!dbColor) {
-            const newColor = await Color.create({product: product.id, color})
-            productColorsIds.push(newColor.id)
-        }
-        else{
-            productColorsIds.push(dbColor.id)
-            dbColor.product.push(product_id)
-            await dbColor.save()
-        }
-    })
-   );
+if (variations) {
+    const variationFormed = variations.split(',').map((variation: string) => variation.trim());
+    const productVariationsIds: Array<string> = [];
+ 
+    await Promise.all(
+     variationFormed.map(async(variation: string) => {
+         const dbVariation: any = await Variation.findOne({variation});
+         let product_id = product.id
+         if (!dbVariation) {
+             const newVariation = await Variation.create({product: product.id, variation})
+             productVariationsIds.push(newVariation.id)
+         }
+         else{
+             productVariationsIds.push(dbVariation.id)
+             dbVariation.product.push(product_id)
+             await dbVariation.save()
+         }
+     })
+    );
+    
+    product.variation = productVariationsIds;
 
-   await Promise.all(
-    sizeFormed.map(async(size: string) => {
-        const dbSize: any = await Size.findOne({size})
-        
-        if (!dbSize) {
-            const newSize = await Size.create({product: product.id, size})
-            productSizesIds.push(newSize.id)
-        }
-        else{
-            dbSize.product.push(product.id)
-            productSizesIds.push(dbSize.id)
-            await dbSize.save()
-        }
-    })
-   )
-   
-   product.colors = productColorsIds;
-   product.sizes = productSizesIds;
-
+}
    await product.save()
-
    if (!product) {
     return  res.status(501).json({
-        status: `Failed !!!!!!!!!!!!`,
+        status: `failed`,
         message: `Unable to upload your product !!!!!!!!!`
     })
    }
    return res.status(200).json({
-    status: `Success ...............`,
+    status: `success`,
     message: `Product uploaded`,
     product
 })
 
    } catch (error: any) {
-    res.status(500).json({
-        status: `Failed !!!!!!!!!!!!`,
+    return res.status(500).json({
+        status: `failed`,
         message: error.message
     })
    }

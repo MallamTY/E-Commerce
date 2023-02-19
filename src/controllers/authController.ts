@@ -221,7 +221,7 @@ export const verifyOTP: RequestHandler = async(req, res, next) => {
     }
     return res.status(404).json({
         status: `failed`,
-        message: `YOur one-time-password has expired !!!`,
+        message: `Your one-time-password has expired !!!`,
     });
 
     } catch (error: any) {

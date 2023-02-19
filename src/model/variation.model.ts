@@ -19,6 +19,6 @@ const colorSchema = new mongoose.Schema(
   }
 );
 
-const Color = mongoose.model('Color', colorSchema);
+const Variation = mongoose.model('Variation', colorSchema);
 
-export default Color;
+export default Variation;
