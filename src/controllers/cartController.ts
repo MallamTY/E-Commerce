@@ -36,7 +36,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
 
             const index = cart.products.findIndex((value: any) => 
             value.product.toString() === product_id.toString());
-
+   
             if(!variation) {
                 if (index !== -1 && quantity <= 0) {
                     cart.products.splice(index, 1)
@@ -46,8 +46,15 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                     cart.products[index].totalProductPrice += price * quantity
                     cart.totalQuantity += quantity;
                     cart.totalPrice += price * quantity;
+
+                    cart.save();
+                    return res.status(201).json({
+                        status: `success`,
+                        message: `product added to your cart`,
+                        cart
+                    })
                 }
-                else if(index !== -1 && quantity > 0) {
+                else if(index === -1 && quantity > 0) {
                     
                     cart.products.push({
                         product: product_id,
@@ -59,7 +66,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
     
                     cart.save();
                     return res.status(201).json({
-                        status: `Success ...............`,
+                        status: `success`,
                         message: `product added to your cart`,
                         cart
                     })
@@ -77,17 +84,17 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
             else if (index !== -1 && cart.products[index].selectedVariation.toString() 
             === variationObjId.toString()
             ) {
-                cart.products[index].selectedVaraition += variation;
+                cart.products[index].selectedVariation += variation;
                 cart.products[index].totalProductQuantity += quantity;
                 cart.products[index].totalProductPrice += price * quantity
                 cart.totalQuantity += quantity;
                 cart.totalPrice += price * quantity;
             }
-            else if(index !== -1 && quantity > 0) {
+            else if(index === -1) {
                 
                 cart.products.push({
                     product: product_id,
-                    selectedariation: variationObjId,
+                    selectedVariation: variationObjId,
                     totalProductQuantity: quantity,
                     totalProductPrice: price * quantity
                 })
@@ -96,7 +103,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
 
                 cart.save();
                 return res.status(201).json({
-                    status: `Success ...............`,
+                    status: `success`,
                     message: `product added to your cart`,
                     cart
                 })
@@ -115,7 +122,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                 customer: user_id,
                 products:[{
                     product: product_id,
-                    selectedVaraition: variationObjId,
+                    selectedVariation: variationObjId,
                     totalProductQuantity: quantity,
                     totalProductPrice: price * quantity
                 }],
@@ -130,7 +137,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                 })
             }
             return res.status(201).json({
-                status: `Success ...............`,
+                status: `success`,
                 message: `product added to your cart`,
                 cart: newCart
             })
@@ -154,7 +161,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                     })
                 }
                 return res.status(201).json({
-                    status: `Success ...............`,
+                    status: `success`,
                     message: `product added to your cart`,
                     cart: newCart
                 })
@@ -170,335 +177,351 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
     }
 }
 
-// export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
-//     try {
-//         let reqbody: {
-//             user_id: string,
-//             product_id: string,
-//             size: string,
-//             color: string
-//         }
+export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
+    try {
+        let reqbody: {
+            user_id: string,
+            product_id: string,
+            variation: string
+        }
     
-//         const {user: {user_id},
-//                     body: {size, color, product_id}    
-//         } = req;
+        const {user: {user_id},
+                    body: {variation, product_id}    
+        } = req;
+        
+        const cart = await Cart.findOne({customer: user_id});
+        const dbVariation = await Variation.findOne({variation});
+        const variationObjId = dbVariation?.id;
+        const product = await Product.findById(product_id);
+        const price: any = product?.price;
+
+        if(!cart) {
+            return res.status(406).json({
+                status: `failed`,
+                message: `Cart is empty !!!`
+            }) 
+        }
         
         
-//         if(!size) {
-//             return res.status(406).json({
-//                 status: `Failed !!!!!`,
-//                 message: `Size must be specified !!!`
-//             }) 
-//         }
-        
-//         if(!color) {
-//             return res.status(406).json({
-//                 status: `Failed !!!!!`,
-//                 message: `Color must be specified !!!`
-//             }) 
-//         }
-        
-//         const cart = await Cart.findOne({customer: user_id});
-//         const dbColor = await Color.findOne({color});
-//         const dbSize = await Size.findOne({size});
-//         const colorObjId = dbColor?.id; 
-//         const sizeObjId = dbSize?.id;
-//         const product = await Product.findById(product_id);
-//         const price: any = product?.price;
-//         if(!cart) {
-//             return res.status(406).json({
-//                 status: `Failed !!!!!`,
-//                 message: `Cart is empty !!!`
-//             }) 
-//         }
-        
-        
-//         const productsIndexes: any = cart.products.reduce((outputArray: Array<number>, currentProduct, index: number) => {
-//             if (currentProduct.product.toString() === product_id.toString()) outputArray.push(index);
+        const productsIndexes: any = cart.products.reduce((outputArray: Array<number>, currentProduct, index: number) => {
+            if (currentProduct.product.toString() === product_id.toString()) outputArray.push(index);
             
-//             return outputArray;
-//           }, []);
-//           if (productsIndexes === -1) {
-//             return res.status(406).json({
-//                 status: `Failed !!!!!`,
-//                 message: `${product?.name} has not been carted`
-//             }) 
-//           };
-//           for (const productIndex of productsIndexes) {
-//             const colorToString: any = cart.products[productIndex].selectedColor;
-//             const sizeToString: any = cart.products[productIndex].selectedSize;
-//             if (
-//                 cart.products[productIndex].totalProductQuantity === 1 && 
-//                 colorToString.toString() === colorObjId.toString() &&
-//                 sizeToString.toString() === sizeObjId.toString()
-//               ) {
-//                 cart.products.splice(productIndex, 1);
-//                 cart.totalQuantity -= 1;
-//                 cart.totalPrice -= price;
-//             }
-//             else if(
-//                 colorToString.toString() === colorObjId.toString() &&
-//                 sizeToString.toString() === sizeObjId.toString()
-//             ){
-//                 const updatedProductTotalQuantity =
-//                 cart.products[productIndex].totalProductQuantity - 1;
-//                 const updatedProductTotalPrice =
-//                 cart.products[productIndex].totalProductPrice - price;
-//                 const updatedCartTotalQuantity = cart.totalQuantity - 1;
-//                 const updatedCartTotalPrice = cart.totalPrice - price;
-//                 cart.products[productIndex].totalProductQuantity =
-//                 updatedProductTotalQuantity;
-//                 cart.products[productIndex].totalProductPrice = updatedProductTotalPrice;
-//                 cart.totalQuantity = updatedCartTotalQuantity;
-//                 cart.totalPrice = updatedCartTotalPrice;
-//             }
-//             }
-//             const updatedCart = await cart.save();
-//             return res.status(200).json({
-//                 status: `success !!!!!`,
-//                 message: `Cart has been reduced by one !!!`,
-//                 cart: updatedCart
-//             }) 
-//     } catch (error: any) {
-//         res.status(500).json({
-//             status: `Failed !!!!!!!!!!!!`,
-//             message: error.message
-//         })
-//     }
-// }
-// export const IncreaseCartByOne: RequestHandler = async(req, res, next) => {
-//     try {
-//         let reqbody: {
-//             user_id: string,
-//             product_id: string,
-//             size: string,
-//             color: string
-//         }
-    
-//         const {user: {user_id},
-//                     body: {size, color, product_id}    
-//         } = req;
-        
-        
-//         if(!size) {
-//             return res.status(406).json({
-//                 status: `Failed !!!!!`,
-//                 message: `Size must be specified !!!`
-//             }) 
-//         }
-        
-//         if(!color) {
-//             return res.status(406).json({
-//                 status: `Failed !!!!!`,
-//                 message: `Color must be specified !!!`
-//             }) 
-//         }
-        
-//         const cart = await Cart.findOne({customer: user_id});
-//         const dbColor = await Color.findOne({color});
-//         const dbSize = await Size.findOne({size});
-//         const colorObjId = dbColor?.id; 
-//         const sizeObjId = dbSize?.id;
-//         const product = await Product.findById(product_id);
-//         const price: any = product?.price;
-//         if(!cart) {
-//             return res.status(406).json({
-//                 status: `Failed !!!!!`,
-//                 message: `Cart is empty !!!`
-//             }) 
-//         }
-        
-
-//         const productsIndexes: any = cart.products.reduce((outputArray: Array<number>, currentProduct, index: number) => {
-//             if (currentProduct.product.toString() === product_id.toString()) outputArray.push(index);
+            return outputArray;
+          }, []);
+          
+          if(variation) {
+            if (productsIndexes.length === 0) {
+                return res.status(406).json({
+                    status: `failed`,
+                    message: `${product?.name} has not been carted`
+                }) 
+              };
+            for (const productIndex of productsIndexes) {
             
+            const variationToString: any = cart.products[productIndex].selectedVariation;
 
-//             return outputArray;
-//           }, []);
+            if (
+                cart.products[productIndex].totalProductQuantity === 1 && 
+                variationToString.toString() === variationObjId.toString()
+                ) {
+                cart.products.splice(productIndex, 1);
+                cart.totalQuantity -= 1;
+                cart.totalPrice -= price;
+            }
+            else if(
+                variationToString.toString() === variationObjId.toString()
+            ){
+                cart.products[productIndex].totalProductQuantity -= 1; 
+                cart.products[productIndex].totalProductPrice -= price;
+                cart.totalQuantity -= 1
+                cart.totalPrice -= price;
+            }
+            }
+            const updatedCart = await cart.save();
+            return res.status(200).json({
+                status: `success`,
+                message: `Cart has been reduced by one !!!`,
+                cart: updatedCart
+            }) 
+            };
+        
+
+            if (productsIndexes.length === 0) {
+                return res.status(406).json({
+                    status: `failed`,
+                    message: `${product?.name} has not been carted`
+                }) 
+              };
+            for (const productIndex of productsIndexes) {
+
+            if (
+                cart.products[productIndex].totalProductQuantity === 1
+              ) {
+                cart.products.splice(productIndex, 1);
+                cart.totalQuantity -= 1;
+                cart.totalPrice -= price;
+            }
+
+            else{
+                 
+                cart.products[productIndex].totalProductQuantity -= 1; 
+                cart.products[productIndex].totalProductPrice -= price;
+                cart.totalQuantity -= 1
+                cart.totalPrice -= price;
+            }
+          }
+            const updatedCart = await cart.save();
+            return res.status(200).json({
+                status: `success`,
+                message: `Cart has been reduced by one !!!`,
+                cart: updatedCart
+            }) 
+          
+    } catch (error: any) {
+        res.status(500).json({
+            status: `failed`,
+            message: error.message
+        })
+    }
+}
 
 
-
-//           if (productsIndexes === -1) {
-//             return res.status(406).json({
-//                 status: `Failed !!!!!`,
-//                 message: `${product?.name} has not been carted`
-//             }) 
-//           };
-//           for (const productIndex of productsIndexes) {
-//             const colorToString: any = cart.products[productIndex].selectedColor;
-//             const sizeToString: any = cart.products[productIndex].selectedSize;
-
-//             if(
-
-//                 colorToString.toString() === colorObjId.toString() &&
-//                 sizeToString.toString() === sizeObjId.toString()
-//             ){
-//                 const updatedProductTotalQuantity =
-//                 cart.products[productIndex].totalProductQuantity + 1;
-//                 const updatedProductTotalPrice =
-//                 cart.products[productIndex].totalProductPrice + price;
-//                 const updatedCartTotalQuantity = cart.totalQuantity + 1;
-//                 const updatedCartTotalPrice = cart.totalPrice + price;
-//                 cart.products[productIndex].totalProductQuantity =
-//                 updatedProductTotalQuantity;
-//                 cart.products[productIndex].totalProductPrice = updatedProductTotalPrice;
-//                 cart.totalQuantity = updatedCartTotalQuantity;
-//                 cart.totalPrice = updatedCartTotalPrice;
-//             }
-//         }
-//         const updatedCart = await cart.save();
-//         return res.status(200).json({
-//             status: `success !!!!!`,
-//             message: `Cart has been reduced by one !!!`,
-//             cart: updatedCart
-//         }) 
-//     } catch (error: any) {
-//         res.status(500).json({
-//             status: `Failed !!!!!!!!!!!!`,
-//             message: error.message
-//         })
-//     }
-// }
-// export const getCartedProduct: RequestHandler = async(req, res, next) => {
-// try {
+export const IncreaseCartByOne: RequestHandler = async(req, res, next) => {
+    try {
+        let reqbody: {
+            user_id: string,
+            product_id: string,
+            size: string,
+            color: string
+        }
     
-//         let reqbody: {
-//         user_id: string
-//     }
-    
-//    let {user: {user_id}} = req;
-//    const cart = await Cart.findOne({customer: user_id});
-//    if (!cart) {
-//     return res.status(406).json({
-//         status: `Failed !!!!!`,
-//         message: `Cart is empty !!!`
-//     }) 
-//    }
-//    return res.status(200).json({
-//     status: `Success ........`,
-//     message: `Cart successfully loaded .....`,
-//     cart
-//    })
-// } catch (error: any) {
-//     res.status(500).json({
-//         status: `Failed !!!!!!!!!!!!`,
-//         message: error.message
-//     })
-// }
-// }
-// export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
-// try {
-//     let reqbody: {
-//         user_id: string,
-//         product_id: string,
-//         size: string,
-//         color: string
-//     }
-//     const {user: {user_id},
-//                 body: {size, color, product_id}    
-//     } = req;
-    
-//     if(!size) {
-//         return res.status(406).json({
-//             status: `Failed !!!!!`,
-//             message: `Size must be specified !!!`
-//         }) 
-//     }
-    
-//     if(!color) {
-//         return res.status(406).json({
-//             status: `Failed !!!!!`,
-//             message: `Color must be specified !!!`
-//         }) 
-//     }
-    
-    
-//     const cart: any = await Cart.findOne({customer: user_id});
-//     const dbColor= await Color.findOne({color});
-//     const dbSize = await Size.findOne({size});
-//     const colorObjId = dbColor?.id;
-//     const sizeObjId = dbSize?.id;
-//     const product: any = await Product.findById(user_id);
-//     const productIndexes: any = cart?.products.reduce((outputArray: Array<number>,
-//         currentProduct: any, index: number
-//         ) => {
-//             if (currentProduct.product.toString() === product_id.toString())
-//             outputArray.push(index);
-//             return outputArray; 
-//         }, [])
-//         for (const productIndex of productIndexes) {
-//             const colorToString: any = cart?.products[productIndex].selectedColor;
-//             const sizeToString: any = cart?.products[productIndex].selectedSize;
+        const {user: {user_id},
+                    body: {variation, product_id}    
+        } = req;
+        
+        const cart = await Cart.findOne({customer: user_id});
+        const dbVariation = await Variation.findOne({variation});
+        const variationObjId = dbVariation?.id;
+        const product = await Product.findById(product_id);
+        const price: any = product?.price;
 
+        if(!cart) {
+            return res.status(406).json({
+                status: `failed`,
+                message: `Cart is empty !!!`
+            }) 
+        }
+        
+        const productsIndexes: any = cart.products.reduce((outputArray: Array<number>, currentProduct, index: number) => {
+            if (currentProduct.product.toString() === product_id.toString()) outputArray.push(index);
             
-//             if (colorToString.toString() === colorObjId.toString() &&
-//                 sizeToString.toString() === sizeObjId.toString()
-//             ) {
+            return outputArray;
+          }, []);
+          
+          if(variation) {
+            if (productsIndexes.length === 0) {
+                return res.status(406).json({
+                    status: `failed`,
+                    message: `${product?.name} has not been carted`
+                }) 
+              };
+            for (const productIndex of productsIndexes) {
+            
+            const variationToString: any = cart.products[productIndex].selectedVariation;
 
-//                 const totalPrice: number = cart?.totalPrice - cart?.products[productIndex].totalProductPrice;
-//                 const totalQuantity = cart.totalQuantity - cart.products[productIndex].totalProductQuantity;
+            if (
+                variationToString.toString() === variationObjId.toString()
+                ) {
+                cart.products[productIndex].totalProductQuantity += 1; 
+                cart.products[productIndex].totalProductPrice += price;
+                cart.totalQuantity += 1;
+                cart.totalPrice += price;
+            }
+            }
+            const updatedCart = await cart.save();
+            return res.status(200).json({
+                status: `success`,
+                message: `Cart has been reduced by one !!!`,
+                cart: updatedCart
+            }) 
+            };
 
-//                 cart?.products.splice(productIndex, 1);
+            if (productsIndexes.length === 0) {
+                return res.status(406).json({
+                    status: `failed`,
+                    message: `${product?.name} has not been carted`
+                }) 
+              };
+            for (const productIndex of productsIndexes){
+                 
+                cart.products[productIndex].totalProductQuantity += 1; 
+                cart.products[productIndex].totalProductPrice += price;
+                cart.totalQuantity += 1
+                cart.totalPrice += price;
+          };
 
-//                 cart.totalPrice = totalPrice;
-//                 cart.totalQuantity = totalQuantity;
-//                 await cart.save();
-
-//                 return res.status(200).json({
-//                     status: `Success .......`,
-//                     message: `Product deleted from cart .......`,
-//                     cart
-//                 })
-//             }
-//         }
-
-//         await cart.save();
-
-//         return res.status(200).json({
-//             status: `Success .......`,
-//             message: `Product deleted from cart .......`,
-//             cart
-//         })
-// } catch (error: any) {
-//     res.status(500).json({
-//         status: `Failed !!!!!!!!!!!!`,
-//         message: error.message
-//     })
-// }
-// };
-// export const deleteCart: RequestHandler = async(req, res, next) => {
-//  try {
-//     let reqbody: {
-//         user_id: string
-//     };
-
-//     const {user: {user_id}} = req;
-
-//     const cart = await Cart.findById(user_id);
-//     const cart = await Cart.findOne({customer: user_id});
-//     console.log(cart);
+            const updatedCart = await cart.save();
+            return res.status(200).json({
+                status: `success`,
+                message: `Cart has been reduced by one !!!`,
+                cart: updatedCart
+            }) 
+          
+         
+    } catch (error: any) {
+        return res.status(500).json({
+            status: `failed`,
+            message: error.message
+        })
+    }
+}
 
 
-//     if (!cart) {
-//         return res.status(406).json({
-//             status: `Failed !!!!!`,
-//             message: `Cart is empty !!!`
-//         });  
-//     }
+export const getCartedProduct: RequestHandler = async(req, res, next) => {
+    try {
+        
+        let reqbody: {
+            user_id: string
+        };
+        
+        let {user: {user_id}} = req;
+        const cart = await Cart.findOne({customer: user_id});
+        if (!cart) {
+            return res.status(406).json({
+                status: `Failed !!!!!`,
+                message: `Cart is empty !!!`
+            }) 
+        }
+        return res.status(200).json({
+            status: `Success ........`,
+            message: `Cart successfully loaded .....`,
+            cart
+        })
+    } catch (error: any) {
+        return res.status(500).json({
+            status: `Failed !!!!!!!!!!!!`,
+            message: error.message
+        })
+    }
+}
+    
 
-//     await Cart.findByIdAndDelete(user_id);
-//     await Cart.findOneAndDelete({customer:user_id});
 
-//     return res.status(406).json({
-//     return res.status(200).json({
-//         status: `Success !!!!!`,
-//         message: `Cart successfully deleted !!!`
-//     });  
-// }
-//  catch (error: any) {
-//     res.status(500).json({
-//         status: `Failed !!!`,
-//         error: error.message
-//     })
-//  }
-// }
+
+export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
+    try {
+    let reqbody: {
+        user_id: string,
+        product_id: string
+    }
+
+    const {user: {user_id},
+                body: {variation, product_id}    
+    } = req;
+    
+    
+    const cart: any = await Cart.findOne({customer: user_id});
+    const dbVariation = await Variation.findOne({variation});
+    const variationObjId = dbVariation?.id;
+    const product: any = await Product.findById(user_id);
+
+
+    const productIndexes: any = cart?.products.reduce((outputArray: Array<number>,
+        currentProduct: any, index: number
+        ) => {
+            if (currentProduct.product.toString() === product_id.toString())
+            outputArray.push(index);
+            return outputArray; 
+        }, []);
+
+        if(variation) {
+            for (const productIndex of productIndexes) {
+                const varationToString: any = cart?.products[productIndex].selectedVariation;
+    
+                
+                if (varationToString.toString() === variationObjId.toString()
+                ) {
+                    cart?.products.splice(productIndex, 1);
+    
+                    cart.totalPrice -= cart?.products[productIndex].totalProductPrice;
+                    cart.totalQuantity -= cart.products[productIndex].totalProductQuantity;
+                    await cart.save();
+    
+                    return res.status(200).json({
+                        status: `Success .......`,
+                        message: `Product deleted from cart .......`,
+                        cart
+                    })
+                }
+            }
+    
+        }
+
+        for (const productIndex of productIndexes) { {
+                cart?.products.splice(productIndex, 1);
+
+                cart.totalPrice -= cart?.products[productIndex].totalProductPrice;
+                cart.totalQuantity -= cart.products[productIndex].totalProductQuantity;
+                await cart.save();
+
+                return res.status(200).json({
+                    status: `Success .......`,
+                    message: `Product deleted from cart .......`,
+                    cart
+                })
+            }
+        }
+
+
+        
+        await cart.save();
+
+        return res.status(200).json({
+            status: `Success .......`,
+            message: `Product deleted from cart .......`,
+            cart
+        })
+} catch (error: any) {
+    res.status(500).json({
+        status: `Failed !!!!!!!!!!!!`,
+        message: error.message
+    })
+}
+};
+
+
+export const deleteCart: RequestHandler = async(req, res, next) => {
+
+    try {
+        let reqbody: {
+            user_id: string
+        };
+    
+        const {user: {user_id}} = req;
+    
+        const cart = await Cart.findOne({customer: user_id});
+        console.log(cart);
+    
+    
+        if (!cart) {
+            return res.status(406).json({
+                status: `Failed !!!!!`,
+                message: `Cart is empty !!!`
+            });  
+        }
+    
+        await Cart.findOneAndDelete({customer:user_id});
+    
+        return res.status(200).json({
+            status: `Success !!!!!`,
+            message: `Cart successfully deleted !!!`
+        });  
+    } 
+
+    catch (error: any) {
+        return res.status(500).json({
+            status: `Failed !!!`,
+            error: error.message
+        }) 
+    }
+}

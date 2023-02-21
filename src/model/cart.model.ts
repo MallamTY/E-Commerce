@@ -14,7 +14,7 @@ const cartSchema = new mongoose.Schema(
           ref: 'Product',
           required: true
         },
-        selectedVaraition: {
+        selectedVariation: {
           type: mongoose.Types.ObjectId,
           ref: 'Variation'
         },

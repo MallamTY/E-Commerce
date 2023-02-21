@@ -10,7 +10,7 @@ const colorSchema = new mongoose.Schema(
         ref: 'Product'
       }
     ],
-    color: {
+    variation: {
       type: String
     }
   },

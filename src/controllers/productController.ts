@@ -72,7 +72,7 @@ if (variations) {
          const dbVariation: any = await Variation.findOne({variation});
          let product_id = product.id
          if (!dbVariation) {
-             const newVariation = await Variation.create({product: product.id, variation})
+             const newVariation = await Variation.create({product: product.id, variation: variations})
              productVariationsIds.push(newVariation.id)
          }
          else{
