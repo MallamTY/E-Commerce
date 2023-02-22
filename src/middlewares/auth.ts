@@ -33,10 +33,10 @@ const Authentication: RequestHandler = (req, res, next) => {
         next()
         
     } catch (error: any) {
-        return next(res.status(500).json({
-            status: `Failed !!!!!!!!!!!!`,
+        return res.status(500).json({
+            status: `failed`,
             message: error.message
-    }))
+    })
     }
 }
 

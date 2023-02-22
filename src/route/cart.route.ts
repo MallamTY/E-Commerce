@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import { cartProduct,
-          decreaseCartByOne,
+         decreaseCartByOne,
          deleteCart,
          deleteProductFromCart,
          getCartedProduct,

@@ -31,7 +31,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
         const variationObjId = dbVariation?.id;
         const product: any = await Product.findById(product_id);
         let price: number = product.price;
-        
+                
         if (cart) {
 
             const index = cart.products.findIndex((value: any) => 
@@ -43,7 +43,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                 }
                 else if (index !== -1) {
                     cart.products[index].totalProductQuantity += quantity;
-                    cart.products[index].totalProductPrice += price * quantity
+                    cart.products[index].totalProductPrice += price * quantity;
                     cart.totalQuantity += quantity;
                     cart.totalPrice += price * quantity;
 
@@ -77,24 +77,30 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                         message: `Bad request !!!`
                     })
                 } 
-            }            
+            }       
+
             if (index !== -1 && quantity <= 0) {
                 cart.products.splice(index, 1)
             }
             else if (index !== -1 && cart.products[index].selectedVariation.toString() 
             === variationObjId.toString()
             ) {
-                cart.products[index].selectedVariation += variation;
                 cart.products[index].totalProductQuantity += quantity;
                 cart.products[index].totalProductPrice += price * quantity
                 cart.totalQuantity += quantity;
                 cart.totalPrice += price * quantity;
+
+                cart.save();
+                return res.status(201).json({
+                    status: `success`,
+                    message: `product added to your cart`,
+                    cart
+                })
             }
             else if(index === -1) {
-                
+    
                 cart.products.push({
                     product: product_id,
-                    selectedVariation: variationObjId,
                     totalProductQuantity: quantity,
                     totalProductPrice: price * quantity
                 })
@@ -430,21 +436,44 @@ export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
         currentProduct: any, index: number
         ) => {
             if (currentProduct.product.toString() === product_id.toString())
+            
             outputArray.push(index);
             return outputArray; 
         }, []);
+        
+
+        if (!cart) {
+            return res.status(200).json({
+                status: `success`,
+                message: `Cart empty !!!`,
+            })
+        }
+
+        if (productIndexes.length === 0) {
+            return res.status(404).json({
+                status: `failed`,
+                message: `Product not in cart`,
+            })
+        }
 
         if(variation) {
+            
             for (const productIndex of productIndexes) {
                 const varationToString: any = cart?.products[productIndex].selectedVariation;
     
                 
                 if (varationToString.toString() === variationObjId.toString()
                 ) {
-                    cart?.products.splice(productIndex, 1);
-    
+                    if (cart.products.length === 1) {
+                        await Cart.findOneAndDelete({customer: user_id});
+                        return res.status(200).json({
+                            status: `Success .......`,
+                            message: `Product deleted from cart .......`
+                        })
+                    }
                     cart.totalPrice -= cart?.products[productIndex].totalProductPrice;
                     cart.totalQuantity -= cart.products[productIndex].totalProductQuantity;
+                    cart?.products.splice(productIndex, 1);
                     await cart.save();
     
                     return res.status(200).json({
@@ -456,24 +485,30 @@ export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
             }
     
         }
-
-        for (const productIndex of productIndexes) { {
-                cart?.products.splice(productIndex, 1);
-
-                cart.totalPrice -= cart?.products[productIndex].totalProductPrice;
-                cart.totalQuantity -= cart.products[productIndex].totalProductQuantity;
-                await cart.save();
-
+        
+        for (const productIndex of productIndexes) {
+            if (cart.products.length === 1) {
+                await Cart.findOneAndDelete({customer: user_id});
                 return res.status(200).json({
                     status: `Success .......`,
-                    message: `Product deleted from cart .......`,
-                    cart
+                    message: `Product deleted from cart .......`
                 })
             }
+            cart.totalPrice -= cart?.products[productIndex].totalProductPrice;
+            cart.totalQuantity -= cart.products[productIndex].totalProductQuantity;
+            cart?.products.splice(productIndex, 1);
+
+            await cart.save();
+
+            return res.status(200).json({
+                status: `Success .......`,
+                message: `Product deleted from cart .......`,
+                cart
+            })
+            
         }
 
 
-        
         await cart.save();
 
         return res.status(200).json({
@@ -500,9 +535,7 @@ export const deleteCart: RequestHandler = async(req, res, next) => {
         const {user: {user_id}} = req;
     
         const cart = await Cart.findOne({customer: user_id});
-        console.log(cart);
-    
-    
+ 
         if (!cart) {
             return res.status(406).json({
                 status: `Failed !!!!!`,
