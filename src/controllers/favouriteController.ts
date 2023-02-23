@@ -22,7 +22,7 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
         const newFavourites = await Favourite.create({customer: user_id, products: product_id})
 
         return res.status(201).json({
-            status: `Success !!!!!`,
+            status: `success`,
             message: `${product?.name} has been added to your favourite products`,
             favourite: newFavourites
         }); 
@@ -30,7 +30,7 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
     else if (favourites.products.includes(product_id) && favourites.products.length === 1) {
         await Favourite.findOneAndRemove({customer: user_id})
         return res.status(200).json({
-            status: `Success !!!!!`,
+            status: `success`,
             message: `${product?.name} has been removed from your favourite products`,
             favourites: {}
         }); 
@@ -41,7 +41,7 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
         favourites.products.push(product_id);
         favourites.save()
         return res.status(200).json({
-            status: `Success !!!!!`,
+            status: `success`,
             message: `${product?.name} has been added to your favourite products`,
             favourites
         }); 
@@ -55,7 +55,7 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
 
                     await favourites.save()
                     return res.status(200).json({
-                        status: `Success !!!!!`,
+                        status: `success`,
                         message: `${product?.name} has been added to your favourite products`,
                         favourites
                     });  
@@ -67,14 +67,14 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
 
         else{
             return res.status(404).json({
-                status: `Failed !!!!!`,
+                status: `failed`,
                 message: `An error was encountered`
             })
         }
         //favourites.splice(productIndex,1);
    } catch (error: any) {
     res.status(500).json({
-        status: `Failed !!!`,
+        status: `failed`,
         error: error.message
     })
    }
@@ -93,19 +93,19 @@ try {
     const favourite = await Favourite.find({customer: user_id});
     if (favourite.length === 0) {
         return res.status(200).json({
-            status: `Failed !!!!!`,
+            status: `failed`,
             message: `You don't have any product in your favourites list`
         }); 
     }
     
     return res.status(200).json({
-        status: `Success !!!!!`,
+        status: `success`,
         message: `Your favourites list has successfully been obtained`,
         favourite
     }); 
 } catch (error: any) {
     return res.status(500).json({
-        status: 'Failed !!!',
+        status: 'failed',
         message: error.message
     })
 }
@@ -123,7 +123,7 @@ try {
 
     if(!prodInFavourite) {
         return res.status(404).json({
-            status: `Failed !!!!!`,
+            status: `failed`,
             message: `You don't have any favourite list`
         }); 
     }
@@ -132,20 +132,20 @@ try {
     if(!prodInFavourite?.products.includes(product_id)) {
 
     return res.status(404).json({
-        status: `Failed !!!!!`,
+        status: `failed`,
         message: `${product.name} is not on your favourites list`
     }); 
     }
 
 
     return res.status(200).json({
-    status: `Success !!!!!`,
+    status: `success`,
     message: `${product.name} found on your favourites list`,
     
     }); 
 } catch (error: any) {
     return res.status(500).json({
-        status: `Failed !!!`,
+        status: `failed`,
         message: error.message
     })
 }
@@ -162,18 +162,18 @@ try {
         
    if(!deletedFavourite) {
     return res.status(404).json({
-        status: `Failed !!!!!`,
+        status: `failed`,
         message: `Your favourite list is empty !!!`
     }); 
    }
 
    return res.status(200).json({
-    status: `Success !!!!!`,
+    status: `success`,
     message: `Your favourites list has been cleared`
     }); 
 } catch (error: any) {
     res.status(500).json({
-        status: 'Failed !!!',
+        status: 'failed',
         message: error.message
     })
 }

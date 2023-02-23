@@ -1,57 +1,63 @@
-import Order from "../model/checkout.model";
 import Cart from "../model/cart.model";
 import { RequestHandler } from "express";
 import Product from "../model/product.model";
+import Delivery from "../model/doordelivery.model";
 
 
 export const checkout: RequestHandler = async(req, res, next) => {
     try {
-        const {body: {contactdetails, phone, name, deliverymethod, shippingmethod},
-                user: {user_id}
-    } = req
+        const {user: {user_id},
+                body: {pickup_station, doordelivery, state}
+    } = req;
 
-        if(!contactdetails || !deliverymethod || !shippingmethod) {
+    const cart: any = await Cart.findOne({customer: user_id});
+
+    if (!(pickup_station || doordelivery)) {
+        return res.status(406).json({
+            status: `failed`,
+            message: `Delivery method must be specified`
+        })
+    }
+
+    if (pickup_station) {
+        function deliverFeeCalc(deliveryFees: Array<number>): number {
+            return deliveryFees.reduce(function(firstVal, currentVal) {
+                  return firstVal + currentVal
+              })
+             
+          }
+          
+            const productShippingFee: Array<number> = [];
+            
+            for (const product of cart.products) {
+                const fetchedProduct: any = await Product.findById(product.product)
+                const totalQuantity = product.totalProductQuantity;
+                const deliveryFee = fetchedProduct?.deliveryfee;
+                const totalDeliveryFee = totalQuantity * deliveryFee;
+                productShippingFee.push(totalDeliveryFee) ;
+            }
+    
+            const shippingFee: number = deliverFeeCalc(productShippingFee);
+            return res.status(200).json({
+                status: `success`,
+                shippingFee
+            })
+    }
+    else if(doordelivery){
+        if (!state) {
             return res.status(406).json({
-                status: 'success',
-                message: `All field must be filled`
+                status: `failed`,
+                message: `Delivery address must be specified`
             })
         }
-        
-        const cart = await Cart.findOne({customer: user_id});
-        const productShippingFee: any = [];
-
-        cart?.products.forEach(async(product) => {
-            
-            const fetchedProduct = await Product.findById(product.product)
-            productShippingFee.push(fetchedProduct?.deliveryfee)
-            console.log(fetchedProduct?.deliveryfee);
-            
-            
-            
+        const stateDelivery = await Delivery.findOne({state});
+        const deliveryFee: number | undefined = stateDelivery?.deliveryfee;
+        return res.status(200).json({
+            status: `success`,
+            deliveryFee
         })
-        console.log(productShippingFee);
+    }
         
-
-        
-        
-        
-        
-
-        // const productIndexes: any = cart?.products.reduce((outputArray: Array<number>,
-        //     currentProduct: any, index: number
-        //     ) => {
-        //         if (currentProduct.product)
-        //         outputArray.push(index);
-        //         return outputArray; 
-        //     }, []);
-
-        // for(const product of productIndexes){
-        //     const productShippingFee = await cart
-        // }
-        // const order = await Order.create({contactdetails, deliverymethod,
-        //     shippingmethod, subtotel: cart?.totalPrice, total: })
-        
-
     } catch (error: any) {
         return res.status(500).json({
             status: `failed`,

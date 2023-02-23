@@ -14,9 +14,6 @@ const router: Router = express.Router();
 
 
 
-
-
-
 router.post('/add', userAuth,buyerAuth, cartProduct);
 
  router.post('/decrease-one', userAuth, buyerAuth, decreaseCartByOne);

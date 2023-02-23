@@ -20,7 +20,8 @@ const Authentication: RequestHandler = (req, res, next) => {
                 message: `Authorization failed`
             })
         }
-        const token = authorization.split(' ')[1]
+        const token = authorization.split(' ')[1];
+        
         if (!token) {
             return res.status(401).json({
                 status: `Failed !!!!!`,

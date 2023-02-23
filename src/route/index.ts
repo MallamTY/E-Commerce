@@ -5,6 +5,7 @@ import ProductRoutes from './product.route';
 import UserRoutes from './user.route';
 import AuthRoutes from './auth.route';
 import CheckoutRoute from '../route/checkout.route';
+import DeliveryRoute from '../route/delivery.route';
 
 const router = express.Router();
 
@@ -13,8 +14,9 @@ router.use('/auth', AuthRoutes);
 router.use('/cart', CartRoutes);
 router.use('/favourite', FavouriteRoutes);
 router.use('/product',ProductRoutes);
-router.use(CheckoutRoute);
+router.use('/checkout',CheckoutRoute);
 router.use(UserRoutes);
+router.use('/auth', DeliveryRoute);
 
 export default router;
 
