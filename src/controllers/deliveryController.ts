@@ -15,7 +15,9 @@ export const addDeliveryFee: RequestHandler = async(req, res, next) => {
             message: `All field must be specified`
         })
     }
-
+    const firstLetter = state[0].toUpperCase();
+    const otherLetters = state.slice(1).toLowerCase();
+    const joinStataeString = firstLetter+otherLetters;
     const dbDelivery = await  Delivery.findOne({state});
 
     if (dbDelivery) {
@@ -25,7 +27,7 @@ export const addDeliveryFee: RequestHandler = async(req, res, next) => {
         })
     }
 
-    const createdDelivery = await Delivery.create({state, deliveryfee: deliveryFee});
+    const createdDelivery = await Delivery.create({state: joinStataeString, deliveryfee: deliveryFee});
     return res.status(201).json({
         status: `success`,
         message: `Delivery record successfully created`,
@@ -77,8 +79,10 @@ export const updateDeliveryFee: RequestHandler = async(req, res, next) => {
                 message: `Kindly specify the field to update`
             })
         }
-
-        const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, req.body, {new: true});
+        const firstLetter = state[0].toUpperCase();
+        const otherLetters = state.slice(1).toLowerCase();
+        const joinStataeString = firstLetter+otherLetters;
+        const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {state: joinStataeString, deliveryfee}, {new: true});
         if (!dbDelivery) {
             return res.status(500).json({
                 status: `failed`,
