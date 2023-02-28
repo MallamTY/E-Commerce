@@ -43,7 +43,6 @@ export const checkout: RequestHandler = async(req, res, next) => {
                 productDetail.push(product.totalProductQuantity);
                 productDetails.push(productDetail)
             };
-            console.log(productDetails);
             
 
             const shippingFee: number = deliverFeeCalc(productShippingFee);
@@ -57,7 +56,7 @@ export const checkout: RequestHandler = async(req, res, next) => {
                 totalPrice: cart.totalPrice + shippingFee,
                 deliveryfee: shippingFee,
                 paymentmethod: payment_method
-            })
+            }) 
             
             return res.status(200).json({
                 status: `success`,
@@ -84,7 +83,6 @@ export const checkout: RequestHandler = async(req, res, next) => {
             productDetails.push([product.product, product.totalProductQuantity]);
         };
 
-        console.log(productDetails);
         
 
         const order = await Order.create({
@@ -98,7 +96,18 @@ export const checkout: RequestHandler = async(req, res, next) => {
             totalPrice: cart.totalPrice +deliveryFee,
             deliveryfee: deliveryFee,
             paymentmethod: payment_method
-        })
+        });
+
+        let returnedOrder: {
+            totalPrice: number,
+        };
+
+        returnedOrder = {
+            totalPrice: order.totalPrice
+        };
+
+        req.order = returnedOrder;
+       
        
         return res.status(200).json({
             status: `success`,
