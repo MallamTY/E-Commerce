@@ -58,7 +58,6 @@ export const multiUpload = async(body: any, folder: any) => {
 export const deleteImage = async(public_id: string) => {
     return cloudinary.v2.uploader.destroy(public_id, function(err, data) {
         if(err) return err;
-        console.log(data);
     }) 
 }
 

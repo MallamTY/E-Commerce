@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import Variation from "../model/variation.model";
-import { multiUpload} from "../utitlity/cloudinary";
+import { deleteImage, multiUpload, uploads} from "../utitlity/cloudinary";
 import Product from "../model/product.model";
 
 type returnTodo = object | null;
@@ -105,6 +105,99 @@ if (variations) {
         message: error.message
     })
    }
-   
+}
 
-}      
+export const updateProduct: RequestHandler = async(req, res, next) => {
+    try {
+        const {params: {id}} = req;
+
+        if(!id) {
+            return res.status(404).json({
+                status: `failed`,
+                message: `Product ID not specified`,
+            })
+        }
+        
+        const dbProduct: any = await Product.findById(id);
+            deleteImage(dbProduct.main_image_id);
+            for (const public_id of dbProduct.images_id) {
+                deleteImage(public_id);
+            }
+        let public_id = [];
+        let url= [];
+        let files: any = req.files;
+        for(const file of files){
+                const prodImage = await multiUpload(file, 'Product/Images')
+                public_id.push(prodImage.public_id);
+                url.push(prodImage.url);
+                
+        }
+    
+        const main_mage_url: string = url[0];
+        const main_image_id: string= public_id[0];
+        const images_id: string[]= public_id.splice(1,public_id.length - 1)
+        const images_url: string[]= url.splice(1, url.length - 1);
+
+        const updatedProduct = await Product.findByIdAndUpdate({_id: id}, 
+                                                {...req.body, main_mage_url, main_image_id,
+                                                    images_id, images_url
+                                                }, {new: true}).populate('seller');
+
+        if (!updatedProduct) {
+            return res.status(406).json({
+                status: `success`,
+                message: `Product deleted`,
+            })
+        }
+
+        return res.status(201).json({
+            status: `success`,
+            message: `Product updated`,
+            updatedProduct
+
+        })
+        } catch (error: any) {
+        return res.status(500).json({
+            status: `failed`,
+            message: error.message
+        })
+    }
+}
+
+
+export const deleteProduct: RequestHandler = async(req, res, next) => {
+    try {   
+        const {params: {id}} = req;
+
+        if(!id) {
+            return res.status(404).json({
+                status: `failed`,
+                message: `Product ID not specified`,
+            })
+        }
+
+        const deletedProduct: any = await Product.findByIdAndDelete(id);
+        
+        if(!deletedProduct) {
+            return res.status(406).json({
+                status: `failed`,
+                message: `Error encountered while trying to delete product`,
+            })
+        }
+
+        deleteImage(deletedProduct.main_image_id);
+        for (const public_id of deletedProduct.images_id) {
+            deleteImage(public_id);
+        }
+        return res.status(406).json({
+            status: `success`,
+            message: `Product deleted`,
+        })
+    } catch (error: any) {
+        return res.status(500).json({
+            status: `failed`,
+            message: error.message
+        })
+    }
+
+}

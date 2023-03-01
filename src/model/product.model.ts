@@ -10,17 +10,18 @@ const productSchema = new  mongoose.Schema(
     },
     main_mage_url: {
       type: String,
-      required: [false, 'A product must have a main image']
+      required: [true, 'A product must have a main image']
     },
     main_image_id: {
         type: String
     },
     images_url: {
       type: [String],
-      required: [false, 'A product must have sub images']
+      required: [true, 'A product must have sub images']
     },
     images_id: {
-        type: Array
+        type: Array,
+        required: [true, 'A product must have sub images']
     },
     description: {
       type: String,
