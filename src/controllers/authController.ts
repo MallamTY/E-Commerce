@@ -8,6 +8,7 @@ import { sendOTP, sendResetPasswordLink, sendVerificationLink } from '../utitlit
 import { JwtPayload } from 'jsonwebtoken';
 import validator from 'validator';
 import { JWT_SECRET } from '../accessories/configuration';
+import { deleteImage, uploads } from '../utitlity/cloudinary';
 
 
 
@@ -406,6 +407,101 @@ export const resetPassword: RequestHandler = async(req, res, next) => {
         return res.status(500).json({
             status: `Failed !!!`,
             message: error.message
+        })
+    }
+}
+
+
+export const updateUserProfile: RequestHandler = async(req, res, next) => {
+    try {
+        const {user: {user_id}} = req;
+        if (!req.body) {
+            return res.status(406).json({
+                status: `failed`,
+                message: `NO field specified for update`
+            })
+        }
+
+        if(req.body.username){
+            const dbUser = await User.findOne({username: req.body.username});
+            if (dbUser) {
+                return res.status(406).json({
+                    status: `failed`,
+                    message: `Username already exist`
+                })
+            }
+        }
+        if (req.body.email) {
+            const dbUser = await User.findOne({email: req.body.email});
+            if (dbUser) {
+                return res.status(406).json({
+                    status: `failed`,
+                    message: `email already exist`
+                })
+            }
+        }
+        const updatedUser = await User.findByIdAndUpdate({_id: user_id}, {...req.body}, {new: true});
+        if (!updatedUser) {
+            return res.status(406).json({
+                status: `failed`,
+                message: `Error encountered while trying to update your record`
+            })
+        }
+
+        return res.status(200).json({
+            status: `success`,
+            message: `Profile successfully updated`,
+            user: updatedUser
+        })
+    } catch (error: any) {
+        return res.status(500).json({
+            status: `failed `,
+            error: error.message
+        })
+    }
+
+}
+
+
+export const updatedProfilePicture: RequestHandler = async(req, res, next) => {
+    try {
+        const {user: {user_id}} = req;
+
+        if (!req.file) {
+            return res.status(404).json({
+                status: `failed`,
+                message: `Picture not selected`
+            })
+        }
+        const dbUser : any= await User.findById(user_id);
+
+        deleteImage(dbUser.profilepicture_public_url);
+
+        const cloudImage = await uploads(req,'Users');
+        const {public_id, url, secure_url} = cloudImage;
+
+        dbUser.profilepicture_public_url = public_id;
+        dbUser.profilepicture_secure_url = secure_url;
+        dbUser.profilepicture_url = url;
+        const updatedUser = await dbUser.save();
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                status: `failed`,
+                message: `Error encountered while trying to update your profile picture`
+            })
+        }
+
+        return res.status(404).json({
+            status: `success`,
+            message: `Profile picture updated`,
+            user: updatedUser
+        })
+        
+    } catch (error: any) {
+        return res.status(500).json({
+            status: `failed `,
+            error: error.message
         })
     }
 }

@@ -17,7 +17,7 @@ export const sendEmail = async(to: string,
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                type: 'OAuth2',
+                //type: 'OAuth2',
                 user: MAIL_USERNAME,
                 pass: MAIL_PASSWORD,
                 clientId: OAUTH_CLIENTID,
