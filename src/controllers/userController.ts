@@ -112,7 +112,7 @@ export const getUser: RequestHandler = async(req, res, next) => {
                 message: `User not found` 
             })
         }
-        return res.status(406).json({
+        return res.status(200).json({
             status: `success`,
             message: `User found`,
             user: dbUser
@@ -134,11 +134,11 @@ export const getAllUser: RequestHandler = async(req, res, next) => {
         if (!dbUsers) {
             return res.status(406).json({
                 status: `failed`,
-                message: `NO user found` 
+                message: `No user found` 
             })
         }
 
-        return res.status(406).json({
+        return res.status(200).json({
             status: `success`,
             message: `Users found`,
             user: dbUsers

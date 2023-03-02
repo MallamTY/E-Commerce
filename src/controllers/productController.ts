@@ -164,6 +164,66 @@ export const updateProduct: RequestHandler = async(req, res, next) => {
     }
 }
 
+export const getProduct: RequestHandler = async(req, res, next) => {
+    
+    try {
+        const {body: {id}} = req;
+
+        if (!id) {
+            return res.status(404).json({
+                status: `failed`,
+                message: `Product ID is required` 
+            })
+        }
+       
+        const dbProduct = await Product.findById({_id: id});
+        
+        if (!dbProduct) {
+            return res.status(406).json({
+                status: `failed`,
+                message: `Product not found` 
+            })
+        }
+        return res.status(200).json({
+            status: `success`,
+            message: `Product found`,
+            user: dbProduct
+        })
+    } 
+    
+    catch (error: any) {
+        return res.status(500).json({
+            status: `failed `,
+            error: error.message
+        })
+    }
+
+}
+
+export const getAllProduct: RequestHandler = async(req, res, next) => {
+    try {
+        const dbUsers = await Product.find();
+        if (!dbUsers) {
+            return res.status(406).json({
+                status: `failed`,
+                message: `No user found` 
+            })
+        }
+
+        return res.status(200).json({
+            status: `success`,
+            message: `Users found`,
+            user: dbUsers
+        })
+    }
+     catch (error: any) {
+        return res.status(500).json({
+            status: `failed `,
+            error: error.message
+        })
+    }
+}
+
 
 export const deleteProduct: RequestHandler = async(req, res, next) => {
     try {   

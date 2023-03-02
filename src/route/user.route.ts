@@ -1,21 +1,16 @@
 import express from "express";
-import { deleteUser, 
-        getAllUser, 
-        getUser, 
-        registerUser
-} from "../controllers/userController";
-import userAuth from "../middlewares/auth";
-import adminAuth from "../middlewares/verifyAdmin";
+import { User } from "../controllers/index";
+import { Middlewares } from "../middlewares";
 import { multerUploads } from "../services/multer";
 
 const router = express.Router();
 
-router.post('/register-user', multerUploads, registerUser);
+router.post('/register-user', multerUploads, User.registerUser);
 
-router.get('/get-user', userAuth, adminAuth, getUser);
+router.get('/get-user', Middlewares.Authentication, Middlewares.adminAuth, User.getUser);
 
-router.delete('/delete-user', userAuth, adminAuth, deleteUser);
+router.delete('/delete-user', Middlewares.Authentication, Middlewares.adminAuth, User.deleteUser);
 
-router.get('/get-all-user', userAuth, adminAuth, getAllUser);
+router.get('/get-all-user', Middlewares.Authentication, Middlewares.adminAuth, User.getAllUser);
 
 export default router;

@@ -4,10 +4,8 @@ import { MAIL_USERNAME, MAIL_PASSWORD,
     OAUTH_CLIENT_SECRET,
     OAUTH_REFRESH_TOKEN 
 } from '../accessories/configuration';
-import emailOTPTemplate from '../templates/emailOTP';
-import emailTemplate, { templateValues } from '../templates/emailVerification';
-import passwordResetTemplate from '../templates/passwordResetTemplate';
-import { generateOTP } from './otp';
+import { templateValues } from '../templates/emailVerification';
+import { Templates } from '../templates';
 
 
 
@@ -40,7 +38,7 @@ export const sendEmail = async(to: string,
 
 export const sendOTP = async(to: string, username: string, otp: string) => {
   
-    const otpTemplateValues: templateValues = emailOTPTemplate(otp, username);
+    const otpTemplateValues: templateValues = Templates.emailOTPTemplate(otp, username);
     const email: string = to;
     const html: string = otpTemplateValues.html;
     const subject: string = 'Login One-Time-Password';
@@ -53,7 +51,7 @@ export const sendVerificationLink = async(to: string, username: string, token: s
 
     const url = `http://localhost:7000/ecommerce/v1/auth/verify-email/${token}`;
     const subject: string = 'Verification Link';
-    const tokenTemplateValues: templateValues = emailTemplate(url, username);
+    const tokenTemplateValues: templateValues = Templates.emailTemplate(url, username);
     const html: string = tokenTemplateValues.html;
 
     await sendEmail(to,subject, html);
@@ -63,7 +61,7 @@ export const sendResetPasswordLink = async(to: string, username: string, token: 
 
     const url = `http://localhost:7000/ecommerce/v1/auth/reset-password/${token}`;
     const subject: string = 'Reset Password';
-    const tokenTemplateValues: templateValues = passwordResetTemplate(url, username);
+    const tokenTemplateValues: templateValues = Templates.passwordResetTemplate(url, username);
     const html: string = tokenTemplateValues.html;
 
     await sendEmail(to,subject, html);

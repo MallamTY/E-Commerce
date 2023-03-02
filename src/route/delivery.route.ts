@@ -1,14 +1,13 @@
 import express, { Router } from "express";
-import { addDeliveryFee, removeDeliveryFee, updateDeliveryFee } from "../controllers/deliveryController";
-import userAuth from "../middlewares/auth";
-import adminAuth from "../middlewares/verifyAdmin";
+import { Delivery } from "../controllers/index";
+import { Middlewares } from "../middlewares";
 
 const router: Router = express.Router();
 
-router.post('/add-delivery', userAuth, adminAuth, addDeliveryFee);
+router.post('/add-delivery', Middlewares.Authentication, Middlewares.adminAuth, Delivery.addDeliveryFee);
 
-router.delete('/remove-delivery/:id', userAuth, adminAuth, removeDeliveryFee)
+router.delete('/remove-delivery/:id', Middlewares.Authentication, Middlewares.adminAuth, Delivery.removeDeliveryFee)
 
-router.put('/update-delivery/:id', userAuth, adminAuth, updateDeliveryFee);
+router.put('/update-delivery/:id', Middlewares.Authentication, Middlewares.adminAuth, Delivery.updateDeliveryFee);
 
-export default router;
+export default router; 

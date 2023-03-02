@@ -71,7 +71,6 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
                 message: `An error was encountered`
             })
         }
-        //favourites.splice(productIndex,1);
    } catch (error: any) {
     res.status(500).json({
         status: `failed`,

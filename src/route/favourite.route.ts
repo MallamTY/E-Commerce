@@ -1,16 +1,16 @@
 import express from "express";
-import userAuth from "../middlewares/auth";
-import buyerAuth from "../middlewares/verifyUser";
-import { addOrRemoveProductToFavourite, checkProductFromFavourite, deleteFavourite, getFavourite } from "../controllers/favouriteController";
+import { Middlewares } from "../middlewares";
+import { Favourite } from "../controllers/index";
+
 
 const router = express.Router();
 
-router.post('/add-or-remove', userAuth,buyerAuth, addOrRemoveProductToFavourite);
+router.post('/add-or-remove', Middlewares.Authentication,Middlewares.buyerAuth, Favourite.addOrRemoveProductToFavourite);
 
-router.delete('/delete', userAuth,buyerAuth, deleteFavourite);
+router.delete('/delete', Middlewares.Authentication, Middlewares.buyerAuth, Favourite.deleteFavourite);
 
-router.get('/get', userAuth,buyerAuth, getFavourite);
+router.get('/get', Middlewares.Authentication, Middlewares.buyerAuth, Favourite.getFavourite);
 
-router.get('/check-product', userAuth,buyerAuth, checkProductFromFavourite);
+router.get('/check-product', Middlewares.Authentication, Middlewares.buyerAuth, Favourite.checkProductFromFavourite);
 
 export default router

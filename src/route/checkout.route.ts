@@ -1,11 +1,10 @@
 import express from "express";
-import buyerAuth from "../middlewares/verifyUser";
-import userAuth from "../middlewares/auth";
+import { Middlewares } from "../middlewares";
 import { Checkout } from "../controllers";
 
 const router = express.Router();
 
-router.post('/delivery', userAuth,buyerAuth, Checkout.checkout);
+router.post('/delivery', Middlewares.Authentication, Middlewares.buyerAuth, Checkout.checkout);
 
 
 export default router;

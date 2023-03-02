@@ -292,7 +292,7 @@ export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
 }
 
 
-export const IncreaseCartByOne: RequestHandler = async(req, res, next) => {
+export const increaseCartByOne: RequestHandler = async(req, res, next) => {
     try {
         let reqbody: {
             user_id: string,
