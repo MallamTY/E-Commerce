@@ -12,7 +12,7 @@ declare global {
         user_id: string,
         role: string
       };
-      order: {
+      orderCost: {
         totalPrice: number
       }
     }

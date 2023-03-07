@@ -3,7 +3,9 @@ import { RequestHandler } from "express";
 import Product from "../model/product.model";
 import Delivery from "../model/doordelivery.model";
 import Order from "../model/order.model";
-
+import User from "../model/user.model";
+import https from 'https';
+import { SECRET_KEY } from "../accessories/configuration";
 
 export const checkout: RequestHandler = async(req, res, next) => {
     try {
@@ -13,6 +15,7 @@ export const checkout: RequestHandler = async(req, res, next) => {
     } = req;
 
     const cart: any = await Cart.findOne({customer: user_id});
+    const user: any = await User.findById(user_id);
 
     if (!(pickup_station || doordelivery)) {
         return res.status(406).json({
@@ -83,8 +86,6 @@ export const checkout: RequestHandler = async(req, res, next) => {
             productDetails.push([product.product, product.totalProductQuantity]);
         };
 
-        
-
         const order = await Order.create({
             product: productDetails,
             user: user_id,
@@ -97,22 +98,58 @@ export const checkout: RequestHandler = async(req, res, next) => {
             deliveryfee: deliveryFee,
             paymentmethod: payment_method
         });
+        
+        const params = JSON.stringify({
+            "email": user.email,
+            "amount": order.totalPrice * 100
+          });
+          
+          const getLink = async() => {
+          const output = new Promise((resolve, reject) => {
+            const options = {
+              hostname: 'api.paystack.co',
+              port: 443,
+              path: '/transaction/initialize',
+              method: 'POST',
+              reference: 'sfwhfwofhwofbbveirneoi',
+              headers: {
+                Authorization: SECRET_KEY,
+                'Content-Type': 'application/json'
+              }
+            }
+            let data = '';
+            const value = https.request(options, async res => {
+            
+              res.on('data', (chunk) => {
+                data += chunk;
+                 
+               })
 
-        let returnedOrder: {
-            totalPrice: number,
-        };
+               res.on('end', function() {
+                try {
+                  return resolve(JSON.parse(data));
+                } catch(error: any) {
+                    reject(error);
+                }
+                
+            })
+             }).on('error', error => {
+               console.error(error)
+             })
+             value.write(params);
+             value.end();
+            
+          }); return output
+    }
+            const data : any= await getLink();
+            order.paymentId = data.data.reference;
+            order.save()
 
-        returnedOrder = {
-            totalPrice: order.totalPrice
-        };
-
-        req.order = returnedOrder;
-       
-       
-        return res.status(200).json({
+          return res.status(200).json({
             status: `success`,
-            order
-        })
+            data
+          });
+        
     }
         
     } catch (error: any) {

@@ -16,7 +16,7 @@ export const CLOUD_NAME = process.env.CLOUD_NAME;
 export const API_KEY = process.env.API_KEY
 export const API_SECRET= process.env.API_SECRET  
 export const SECURE: any = process.env.SECURE;
-
+export const SECRET_KEY: string | undefined = process.env.SECRET_KEY
 
 export const MAIL_USERNAME: string | undefined = process.env.MAIL_USERNAME;
 export const MAIL_PASSWORD: any = process.env.MAIL_PASSWORD;
