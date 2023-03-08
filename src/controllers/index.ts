@@ -1,8 +1,18 @@
-import { checkout } from "./checkout";
+import { checkout,
+        verifyPayment
+    } from "./checkout";
+
+
 import { addDeliveryFee, 
         removeDeliveryFee, 
         updateDeliveryFee 
     } from "./deliveryController";
+
+import { updateOrder,
+        getAllOrder,
+        getSingleOrder,
+        deleteOrder
+    } from "./orderStateController";
 
 import { logIn,
         verifyEmail,
@@ -52,6 +62,13 @@ export const User = {
     getUser,
     getAllUser,
     deleteUser
+};
+
+export const Order = {
+    updateOrder,
+    getAllOrder,
+    getSingleOrder,
+    deleteOrder
 }
 export const Product = {
     uploadProduct,
@@ -62,7 +79,8 @@ export const Product = {
 }
 
 export const Checkout = {
-    checkout
+    checkout,
+    verifyPayment
 }
 
 export const Delivery = {

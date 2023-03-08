@@ -6,6 +6,7 @@ import Order from "../model/order.model";
 import User from "../model/user.model";
 import https from 'https';
 import { SECRET_KEY } from "../accessories/configuration";
+const generateUniqueId = require('generate-unique-id');
 
 export const checkout: RequestHandler = async(req, res, next) => {
     try {
@@ -13,7 +14,7 @@ export const checkout: RequestHandler = async(req, res, next) => {
                 body: {pickup_station, doordelivery, state, contact_person_name,
                 contact_person_phone, shipping_method, payment_method}
     } = req;
-
+    
     const cart: any = await Cart.findOne({customer: user_id});
     const user: any = await User.findById(user_id);
 
@@ -75,9 +76,9 @@ export const checkout: RequestHandler = async(req, res, next) => {
         }
         const firstLetter = state[0].toUpperCase();
         const otherLetters = state.slice(1).toLowerCase();
-        const joinStataeString = firstLetter+otherLetters;
+        const joinStataeString: string = firstLetter+otherLetters;
         const stateDelivery = await Delivery.findOne({state: joinStataeString});
-        const deliveryFee: any = stateDelivery?.deliveryfee;
+        const deliveryFee: number | undefined = stateDelivery?.deliveryfee;
 
         
         const productDetails: Array<Array<String>> = [];
@@ -98,58 +99,49 @@ export const checkout: RequestHandler = async(req, res, next) => {
             deliveryfee: deliveryFee,
             paymentmethod: payment_method
         });
+        const id = generateUniqueId();
         
         const params = JSON.stringify({
             "email": user.email,
-            "amount": order.totalPrice * 100
+            "amount": order.totalPrice * 100,
+            "reference": id,
+            "callback_url": 'https://medium.com/payment-verify'
+
           });
           
-          const getLink = async() => {
-          const output = new Promise((resolve, reject) => {
-            const options = {
-              hostname: 'api.paystack.co',
-              port: 443,
-              path: '/transaction/initialize',
-              method: 'POST',
-              reference: 'sfwhfwofhwofbbveirneoi',
-              headers: {
-                Authorization: SECRET_KEY,
-                'Content-Type': 'application/json'
-              }
+          const options = {
+            hostname: 'api.paystack.co',
+            port: 443,
+            path: '/transaction/initialize',
+            method: 'POST',
+            headers: {
+              Authorization: SECRET_KEY,
+              'Content-Type': 'application/json'
             }
-            let data = '';
-            const value = https.request(options, async res => {
-            
-              res.on('data', (chunk) => {
-                data += chunk;
-                 
-               })
-
-               res.on('end', function() {
-                try {
-                  return resolve(JSON.parse(data));
-                } catch(error: any) {
-                    reject(error);
-                }
+          }
+          const reqpaystack = https.request(options, (respaystack) => {
+            let dataStream: any = ''
+            respaystack.on('data', (chunk: any) => {
+              dataStream += chunk
+            });
+          
+            respaystack.on('end', async() => {
+                const data = JSON.parse(dataStream);
                 
-            })
-             }).on('error', error => {
-               console.error(error)
-             })
-             value.write(params);
-             value.end();
-            
-          }); return output
-    }
-            const data : any= await getLink();
-            order.paymentId = data.data.reference;
-            order.save()
+                order.txref = data.data.reference;
+                await order.save();
+                return res.status(200).json({
+                    data: JSON.parse(dataStream),
+                    order
+                });
 
-          return res.status(200).json({
-            status: `success`,
-            data
-          });
-        
+            })
+          }).on('error', (error: any) => {
+            console.error(error)
+          })
+          
+          reqpaystack.write(params)
+          reqpaystack.end()
     }
         
     } catch (error: any) {
@@ -158,4 +150,76 @@ export const checkout: RequestHandler = async(req, res, next) => {
             message: error.message
         })
     }
+}
+
+
+export const verifyPayment: RequestHandler = (req, res, next) => {
+    try {
+        const{query: {txref}} = req;
+
+        const options = {
+        hostname: 'api.paystack.co',
+        port: 443,
+        path: `/transaction/verify/${txref}`,
+        method: 'GET',
+        headers: {
+            Authorization: SECRET_KEY,
+            'Content-Type': 'application/json'
+        }
+        }
+
+        const reqpaystack = https.request(options, (respaystack: any) => {
+        let dataStream= '';
+
+        respaystack.on('data', (chunk: any) => {
+            dataStream += chunk
+        });
+
+        respaystack.on('end', async() => {
+            const data = JSON.parse(dataStream);
+            
+            if (data.status === false) {
+                return res.status(400).json({
+                    status: `failed`,
+                    message: `Incomplete transaction`
+                })
+            }
+            else if (data.data.status === 'abandoned' && data.status === true) {
+                return res.status(404).json({
+                    status: `pending`,
+                    message: `This transaction is currently pending, proceed to make payment`
+                })
+            }
+            else if (data.data.status === 'success' && data.status === true) {
+                
+                const order: any = await Order.findOne({txref: data.data.reference});
+                for (const product of order.product) {
+                    const dbProduct: any = await Product.findById(product[0]);
+                    const newQuantity = dbProduct?.quantity - product[1];
+                    await Product.findByIdAndUpdate({_id: product[0]}, {quantity: newQuantity});
+                }
+                order.status = 'Processing';
+                order.paidFor = true;
+                order.timePaid = data.data.paidAt;
+                order.paymentmethod = data.data.channel
+                await order.save();
+
+                return res.status(200).json({
+                    status: `success`,
+                    message: `Payment completed and order in process`,
+                    
+                })
+            }
+        })
+        }).on('error', (error: any) => {
+        console.error(error)
+        });
+        reqpaystack.end();
+    } catch (error: any) {
+        return res.status(500).json({
+            status: `failed`,
+            message: error.message
+        })
+    }
+    
 }

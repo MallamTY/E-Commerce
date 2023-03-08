@@ -59,10 +59,12 @@ const orderSchema = new mongoose.Schema({
     },
     paymentmethod: {
         type: String,
-        enum: ['Bank Transfer', 'USSD', 'Debit Card']
+        enum: ["card", "bank", "ussd", "bank_transfer"]
     },
-    paymentId: {
-        type: String
+    txref: {
+        type: String,
+        required: true,
+        default: ' '
     },
     status: {
         type: String,
