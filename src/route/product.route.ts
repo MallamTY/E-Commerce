@@ -6,13 +6,13 @@ import { multiMulterUploads } from "../services/multer";
 
 const router = express.Router();
 
-router.post('/upload', Middlewares.Authentication , Middlewares.vendorAuth, multiMulterUploads, Product.uploadProduct)
+router.post('/upload/', Middlewares.Authentication , Middlewares.vendorAuth, multiMulterUploads, Product.uploadProduct)
 
 router.delete('/delete/:id', Middlewares.Authentication, Middlewares.adminAuth, Product.deleteProduct);
 
 router.put('/update/:id', Middlewares.Authentication , Middlewares.vendorAuth, multiMulterUploads, Product.updateProduct);
 
-router.get('/get-single', Middlewares.Authentication, Product.getProduct);
+router.get('/get-single/:id', Middlewares.Authentication, Product.getProduct);
 
 router.get('/get-all', Middlewares.Authentication, Product.getAllProduct)
 
