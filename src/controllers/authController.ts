@@ -7,7 +7,12 @@ import Token from '../model/token.model'
 import { sendOTP, sendResetPasswordLink, sendVerificationLink } from '../utitlity/emailSender';
 import { JwtPayload } from 'jsonwebtoken';
 import validator from 'validator';
-import { JWT_SECRET } from '../accessories/configuration';
+import {
+	ReasonPhrases,
+	StatusCodes,
+	getReasonPhrase,
+	getStatusCode,
+} from 'http-status-codes';
 import { deleteImage, uploads } from '../utitlity/cloudinary';
 
 
@@ -35,7 +40,7 @@ export const logIn: RequestHandler = async(req, res, next) => {
         password = reqbody.password;
 
         if(!(username || email) && !password) {
-            return res.status(406).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed !!!!!`,
                 message: `All fields must be filled`
             })
@@ -43,7 +48,7 @@ export const logIn: RequestHandler = async(req, res, next) => {
 
         let userDB: loginType | null = await User.findOne({$or: [{username}, {email}]})
         if (!userDB) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `success`,
                 message: `Invalid credentials !!!!!!`
             })
@@ -51,14 +56,14 @@ export const logIn: RequestHandler = async(req, res, next) => {
         const match = await bcrypt.compare(password, userDB.password);
         
         if (!match) {
-            return res.status(404).json({
+            return res.status(StatusCodes.CONFLICT).json({
                 status: `failed`,
                 message: `Invalid email or password !!!!!!!!!`
             })
         }
 
         if (userDB.isEmailVerified === false) {
-            return res.status(404).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `Account not verified yet, click on the verification link sent to your email !!!!!!!!!`
             })
@@ -70,7 +75,7 @@ export const logIn: RequestHandler = async(req, res, next) => {
         await sendOTP(userDB.email, userDB.username, otp);
         await Token.create({token: otp, user: userDB.id, expires, type: 'Login OTP'});
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `A one-time-password has been sent to your registered email address ...`,
             otp
@@ -78,7 +83,7 @@ export const logIn: RequestHandler = async(req, res, next) => {
         
     
 } catch (error: any) {
-    return res.status(500).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: `failed`,
         message: error.message
     })
@@ -104,21 +109,21 @@ export const verifyEmail: RequestHandler = async(req, res, next) => {
         const dbToken: any = await Token.findOne({user: payload.user_id, type: 'Verification Link'})
     
         if(!token) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Invalid link !!!!!!!!!`
             })
         }
 
         if (!payload) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Error completing this operation !!!!!!!!!`
             })
         }
 
         if (!dbToken) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Expired link !!!!!!!!!`
             })
@@ -128,7 +133,7 @@ export const verifyEmail: RequestHandler = async(req, res, next) => {
         const {user_id} = payload;
         const dbUser: dbObject | any = await User.findById(user_id);
         if (dbUser.isEmailVerified === true) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Linked already used !!!!!!!!!`
             })
@@ -136,13 +141,13 @@ export const verifyEmail: RequestHandler = async(req, res, next) => {
         
         await User.findByIdAndUpdate({_id: user_id}, {isEmailVerified: true})
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Account verified .......`
         })
 
 } catch (error: any) {
-    return res.status(500).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: `failed`,
         message: error.message
     })
@@ -159,13 +164,13 @@ export const resendEmailVerificiationLink:RequestHandler = async(req, res, next)
         await Token.create({token, user: payload.id, expires, type: 'Verification Link'})
         await sendVerificationLink(payload.email, payload.username, newToken);
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Verification link has been resent to ${payload.email}`
         })
     
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         }) 
@@ -179,7 +184,7 @@ export const verifyOTP: RequestHandler = async(req, res, next) => {
                 body: {otp}
                                 } = req;
         if (!user_id) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Invalid credentials !!!!!!!!!`
             })
@@ -196,37 +201,37 @@ export const verifyOTP: RequestHandler = async(req, res, next) => {
                     if (token) {
                         dbToken.valid = false;
                         dbToken.save();
-                        return res.status(200).json({
+                        return res.status(StatusCodes.OK).json({
                             status: `success`,
                             message: `Login successful ..........`,
                             token
                         })
                 }
 
-                return res.status(404).json({
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `Unable to generate login token !!!`
                 })
 
             }
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Invalid one-time-password !!!`,
             })
             
         }
-        return res.status(404).json({
+        return res.status(StatusCodes.EXPECTATION_FAILED).json({
             status: `failed`,
             message: `Invalid one-time-password !!!`,
         })
     }
-    return res.status(404).json({
+    return res.status(StatusCodes.EXPECTATION_FAILED).json({
         status: `failed`,
         message: `Your one-time-password has expired !!!`,
     });
 
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })
@@ -250,7 +255,7 @@ export const resendOTP: RequestHandler = async(req, res, next) => {
             await sendOTP(userDB.email, userDB.username, otp);
             await Token.findByIdAndUpdate(dbOTP.id, {token: otp, expires}); 
 
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 message: `A one-time-pssword has been resent to your registered email address ...`
             });
@@ -260,14 +265,14 @@ export const resendOTP: RequestHandler = async(req, res, next) => {
         await sendOTP(userDB.email, userDB.username, otp);
         await Token.create({token: otp, user: user_id, expires, type: 'Login OTP'});
         
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `A one-time-pssword has been resent to your registered email address ...`,
             otp
         });
 
     } catch (error: any) {
-        return next(res.status(500).json({
+        return next(res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         }))
@@ -279,8 +284,8 @@ export const forgetPassword: RequestHandler = async(req, res, next) => {
     try {
         const {body: {email, username}} = req;
         if(!validator.isEmail(email)) {
-            return res.status(406).json({
-                status: `Failed !!!!!!!!!!!!`,
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                status: `failed`,
                 message: `Invalid email address !!!`
             })
         }
@@ -288,8 +293,8 @@ export const forgetPassword: RequestHandler = async(req, res, next) => {
         const dbUser = await User.findOne({$or: [{email: email. toLowerCase()}, {username}]});
 
         if (!dbUser) {
-            return res.status(406).json({
-                status: `Failed !!!!!!!!!!!!`,
+            return res.status(StatusCodes.NOT_FOUND).json({
+                status: `failed`,
                 message: `User not found !!!`
             })
         }
@@ -297,8 +302,8 @@ export const forgetPassword: RequestHandler = async(req, res, next) => {
         const token = emailTokenGenerator(dbUser.id, dbUser.role, dbUser.email);
 
         if (!token) {
-            return res.status(500).json({
-                status: `Failed !!!!!!!!!!!!`,
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
+                status: `failed`,
                 message: `Unable to generate token !!!`
             })
         }
@@ -310,7 +315,7 @@ export const forgetPassword: RequestHandler = async(req, res, next) => {
             sendResetPasswordLink(dbUser.email, dbUser.username, token);
             await Token.findByIdAndUpdate(dbToken.id, {token, expires});
         
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 message: `A password reset link has been resent to ${dbUser.email}`
             });
@@ -320,14 +325,14 @@ export const forgetPassword: RequestHandler = async(req, res, next) => {
         sendResetPasswordLink(dbUser.email, dbUser.username, token);
         await Token.create({token, user: dbUser.id, expires, type: 'Password Reset'});
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `A password reset link has been sent to ${dbUser.email}`
         });
 
     } catch (error: any) {
-        return res.status(406).json({
-            status: `Failed !!!!!!!!!!!!`,
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            status: `failed`,
             message: error.message
         })
     }
@@ -349,36 +354,36 @@ export const resetPassword: RequestHandler = async(req, res, next) => {
             
 
             if (!validityCheck) {
-                return res.status(406).json({
-                    status: `Failed !!!!!!!!!!!!`,
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    status: `failed`,
                     message: `Invalid link !!!`
                 });
             }
 
             if (validityCheck.valid === false) {
-                return res.status(406).json({
-                    status: `Failed !!!!!!!!!!!!`,
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    status: `failed`,
                     message: `Invalid link !!!`
                 });
             }
 
             if (!validator.isStrongPassword(newPassword || !validator.isStrongPassword(confirmNewPassword))) {
-                return res.status(406).json({
-                    status: `Failed !!!!!!!!!!!!`,
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
+                    status: `failed`,
                     message: `Password not strong enough !!!`
                 });
             }
 
             if (newPassword !== confirmNewPassword) {
-                return res.status(406).json({
-                    status: `Failed !!!!!!!!!!!!`,
+                return res.status(StatusCodes.CONFLICT).json({
+                    status: `failed`,
                     message: `Password not match`
                 });
             }
             
             if (validityCheck.token !== token) {
-                return res.status(406).json({
-                    status: `Failed !!!!!!!!!!!!`,
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
+                    status: `failed`,
                     message: `Invalid link !!!`
                 });
             }
@@ -387,8 +392,8 @@ export const resetPassword: RequestHandler = async(req, res, next) => {
             const updateUser = await User.findById(user_id);
         
             if (!updateUser) {
-                return res.status(406).json({
-                    status: `Failed !!!!!!!!!!!!`,
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
+                    status: `failed`,
                     message: `Unabale to change your password this time !!!`
                 });
             }
@@ -399,12 +404,12 @@ export const resetPassword: RequestHandler = async(req, res, next) => {
 
             const updatedToken = await Token.findOneAndUpdate({id: user_id, type: 'Password Reset'}, {valid: false});
 
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `Success !!!`,
                 message: `Password reset successful ...`
             })
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `Failed !!!`,
             message: error.message
         })
@@ -416,7 +421,7 @@ export const updateUserProfile: RequestHandler = async(req, res, next) => {
     try {
         const {user: {user_id}} = req;
         if (!req.body) {
-            return res.status(406).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `NO field specified for update`
             })
@@ -425,7 +430,7 @@ export const updateUserProfile: RequestHandler = async(req, res, next) => {
         if(req.body.username){
             const dbUser = await User.findOne({username: req.body.username});
             if (dbUser) {
-                return res.status(406).json({
+                return res.status(StatusCodes.BAD_REQUEST).json({
                     status: `failed`,
                     message: `Username already exist`
                 })
@@ -434,7 +439,7 @@ export const updateUserProfile: RequestHandler = async(req, res, next) => {
         if (req.body.email) {
             const dbUser = await User.findOne({email: req.body.email});
             if (dbUser) {
-                return res.status(406).json({
+                return res.status(StatusCodes.BAD_REQUEST).json({
                     status: `failed`,
                     message: `email already exist`
                 })
@@ -442,19 +447,19 @@ export const updateUserProfile: RequestHandler = async(req, res, next) => {
         }
         const updatedUser = await User.findByIdAndUpdate({_id: user_id}, {...req.body}, {new: true});
         if (!updatedUser) {
-            return res.status(406).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Error encountered while trying to update your record`
             })
         }
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Profile successfully updated`,
             user: updatedUser
         })
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed `,
             error: error.message
         })
@@ -468,7 +473,7 @@ export const updatedProfilePicture: RequestHandler = async(req, res, next) => {
         const {user: {user_id}} = req;
 
         if (!req.file) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Picture not selected`
             })
@@ -486,20 +491,20 @@ export const updatedProfilePicture: RequestHandler = async(req, res, next) => {
         const updatedUser = await dbUser.save();
 
         if (!updatedUser) {
-            return res.status(404).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `Error encountered while trying to update your profile picture`
             })
         }
 
-        return res.status(404).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Profile picture updated`,
             user: updatedUser
         })
         
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed `,
             error: error.message
         })

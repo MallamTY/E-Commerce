@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import { StatusCodes } from "http-status-codes";
 import Order from "../model/order.model";
 
 
@@ -10,19 +11,19 @@ export const updateOrder: RequestHandler = async(req, res, next) => {
                                                     {...req.body}, {new: true}
                                             );
         if(!order) {
-            return res.status(406).json({
+            return res.status(StatusCodes.NOT_FOUND).json({
                 status: `failed`,
                 message: `Order not found`,
             })
         }
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Order updated`,
             order
         })
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`, 
             messgae: error.message
         })
@@ -41,20 +42,20 @@ export const getSingleOrder: RequestHandler = async(req, res, next) => {
     }
      const order = await Order.findOne({$or: [{_id: order_id}, {txref: reference}, {...req.body}]})
      if (!order) {
-        return res.status(406).json({
+        return res.status(StatusCodes.NOT_FOUND).json({
             status: `failed`,
             message: `Order not found`,
             order
         })
      }
 
-     return res.status(200).json({
+     return res.status(StatusCodes.OK).json({
         status: `success`,
         message: `Search completed`,
         order
     })
    } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`, 
             messgae: error.message
         })
@@ -67,20 +68,20 @@ export const getAllOrder: RequestHandler = async(req, res, next) => {
   
       const order = await Order.find()
       if (!order) {
-         return res.status(406).json({
+         return res.status(StatusCodes.NOT_FOUND).json({
              status: `failed`,
              message: `Order not found`,
              order
          })
       }
  
-      return res.status(200).json({
+      return res.status(StatusCodes.OK).json({
          status: `success`,
          message: `Search completed`,
          order
      })
     } catch (error: any) {
-         return res.status(500).json({
+         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
              status: `failed`, 
              messgae: error.message
          })
@@ -106,12 +107,12 @@ export const getAllOrder: RequestHandler = async(req, res, next) => {
             })
         }
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Order deleted`
         })
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`, 
             messgae: error.message
         })

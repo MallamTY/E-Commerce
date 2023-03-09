@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import Variation from "../model/variation.model";
 import { deleteImage, multiUpload, uploads} from "../utitlity/cloudinary";
 import Product from "../model/product.model";
+import { StatusCodes } from "http-status-codes";
 
 type returnTodo = object | null;
 interface returnDb {
@@ -25,13 +26,13 @@ export const uploadProduct: RequestHandler = async(req, res, next) => {
 
    reqbody = {name, description, price, quantity, deliveryfee}
    if(!name || !description || !price ||!quantity) {
-    return res.status(406).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
         status: `Failed !!!!!`,
         message: `All fields must be fieled`
     })
    }
    if(!req.files && !req.file){
-    return res.status(406).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
         status: `Failed !!!!!`,
         message: `You need to upload some images of the product`
     })
@@ -39,7 +40,7 @@ export const uploadProduct: RequestHandler = async(req, res, next) => {
    
    const dbProduct = await Product.findOne({$and: [{seller: user_id} , {name}, {description}]})
    if(dbProduct) {
-    return res.status(404).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
         status: `Failed !!!!!`,
         message: `Product with this details exist has already been created !!!!`
     })
@@ -88,19 +89,19 @@ if (variations) {
 }
    await product.save()
    if (!product) {
-    return  res.status(501).json({
+    return  res.status(StatusCodes.FAILED_DEPENDENCY).json({
         status: `failed`,
         message: `Unable to upload your product !!!!!!!!!`
     })
    }
-   return res.status(200).json({
+   return res.status(StatusCodes.OK).json({
     status: `success`,
     message: `Product uploaded`,
     product
 })
 
    } catch (error: any) {
-    return res.status(500).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: `failed`,
         message: error.message
     })
@@ -112,7 +113,7 @@ export const updateProduct: RequestHandler = async(req, res, next) => {
         const {params: {id}} = req;
 
         if(!id) {
-            return res.status(404).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `Product ID not specified`,
             })
@@ -144,20 +145,20 @@ export const updateProduct: RequestHandler = async(req, res, next) => {
                                                 }, {new: true}).populate('seller');
 
         if (!updatedProduct) {
-            return res.status(406).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 message: `Product deleted`,
             })
         }
 
-        return res.status(201).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Product updated`,
             updatedProduct
 
         })
         } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })
@@ -170,7 +171,7 @@ export const getProduct: RequestHandler = async(req, res, next) => {
         const {body: {id}} = req;
 
         if (!id) {
-            return res.status(404).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `Product ID is required` 
             })
@@ -179,12 +180,12 @@ export const getProduct: RequestHandler = async(req, res, next) => {
         const dbProduct = await Product.findById({_id: id});
         
         if (!dbProduct) {
-            return res.status(406).json({
+            return res.status(StatusCodes.NOT_FOUND).json({
                 status: `failed`,
                 message: `Product not found` 
             })
         }
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Product found`,
             user: dbProduct
@@ -192,7 +193,7 @@ export const getProduct: RequestHandler = async(req, res, next) => {
     } 
     
     catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed `,
             error: error.message
         })
@@ -204,20 +205,20 @@ export const getAllProduct: RequestHandler = async(req, res, next) => {
     try {
         const dbUsers = await Product.find();
         if (!dbUsers) {
-            return res.status(406).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `No user found` 
             })
         }
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Users found`,
             user: dbUsers
         })
     }
      catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed `,
             error: error.message
         })
@@ -230,7 +231,7 @@ export const deleteProduct: RequestHandler = async(req, res, next) => {
         const {params: {id}} = req;
 
         if(!id) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Product ID not specified`,
             })
@@ -239,7 +240,7 @@ export const deleteProduct: RequestHandler = async(req, res, next) => {
         const deletedProduct: any = await Product.findByIdAndDelete(id);
         
         if(!deletedProduct) {
-            return res.status(406).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `Error encountered while trying to delete product`,
             })
@@ -249,12 +250,12 @@ export const deleteProduct: RequestHandler = async(req, res, next) => {
         for (const public_id of deletedProduct.images_id) {
             deleteImage(public_id);
         }
-        return res.status(406).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Product deleted`,
         })
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })

@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import { StatusCodes } from "http-status-codes";
 import Cart from "../model/cart.model";
 import Product from "../model/product.model";
 import Variation from "../model/variation.model";
@@ -21,7 +22,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
         
         
         if(!quantity) {
-            return res.status(406).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `Failed !!!!!`,
                 message: `Quantity must be specified !!!`
             }) 
@@ -48,7 +49,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                     cart.totalPrice += price * quantity;
 
                     cart.save();
-                    return res.status(201).json({
+                    return res.status(StatusCodes.OK).json({
                         status: `success`,
                         message: `product added to your cart`,
                         cart
@@ -65,14 +66,14 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                     cart.totalPrice += price * quantity;
     
                     cart.save();
-                    return res.status(201).json({
+                    return res.status(StatusCodes.OK).json({
                         status: `success`,
                         message: `product added to your cart`,
                         cart
                     })
                 }
                 else {
-                    return res.status(400).json({
+                    return res.status(StatusCodes.BAD_GATEWAY).json({
                         status: `Failed !!!`,
                         message: `Bad request !!!`
                     })
@@ -91,7 +92,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                 cart.totalPrice += price * quantity;
 
                 cart.save();
-                return res.status(201).json({
+                return res.status(StatusCodes.OK).json({
                     status: `success`,
                     message: `product added to your cart`,
                     cart
@@ -108,7 +109,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                 cart.totalPrice += price * quantity;
 
                 cart.save();
-                return res.status(201).json({
+                return res.status(StatusCodes.OK).json({
                     status: `success`,
                     message: `product added to your cart`,
                     cart
@@ -116,8 +117,8 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
             }
 
             else {
-                return res.status(400).json({
-                    status: `Failed !!!`,
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    status: `failed`,
                     message: `Bad request !!!`
                 })
             }
@@ -137,12 +138,12 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
             })
             
             if (!newCart) {
-                return res.status(400).json({
-                    status: `Failed !!!`,
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
+                    status: `failed`,
                     message: `Error adding cart !!!`
                 })
             }
-            return res.status(201).json({
+            return res.status(StatusCodes.CREATED).json({
                 status: `success`,
                 message: `product added to your cart`,
                 cart: newCart
@@ -161,12 +162,12 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
                 })
                 
                 if (!newCart) {
-                    return res.status(400).json({
-                        status: `Failed !!!`,
+                    return res.status(StatusCodes.EXPECTATION_FAILED).json({
+                        status: `failed`,
                         message: `Error adding cart !!!`
                     })
                 }
-                return res.status(201).json({
+                return res.status(StatusCodes.CREATED).json({
                     status: `success`,
                     message: `product added to your cart`,
                     cart: newCart
@@ -176,7 +177,7 @@ export const cartProduct: RequestHandler = async(req, res, next) => {
    
     
     } catch (error:any) {
-        res.status(500).json({
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `Failed !!!!!!!!!!!!`,
             message: error.message
         })
@@ -202,7 +203,7 @@ export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
         const price: any = product?.price;
 
         if(!cart) {
-            return res.status(406).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Cart is empty !!!`
             }) 
@@ -217,7 +218,7 @@ export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
           
           if(variation) {
             if (productsIndexes.length === 0) {
-                return res.status(406).json({
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `${product?.name} has not been carted`
                 }) 
@@ -244,7 +245,7 @@ export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
             }
             }
             const updatedCart = await cart.save();
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 message: `Cart has been reduced by one !!!`,
                 cart: updatedCart
@@ -253,7 +254,7 @@ export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
         
 
             if (productsIndexes.length === 0) {
-                return res.status(406).json({
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `${product?.name} has not been carted`
                 }) 
@@ -277,14 +278,14 @@ export const decreaseCartByOne: RequestHandler = async(req, res, next) => {
             }
           }
             const updatedCart = await cart.save();
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 message: `Cart has been reduced by one !!!`,
                 cart: updatedCart
             }) 
           
     } catch (error: any) {
-        res.status(500).json({
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })
@@ -312,7 +313,7 @@ export const increaseCartByOne: RequestHandler = async(req, res, next) => {
         const price: any = product?.price;
 
         if(!cart) {
-            return res.status(406).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Cart is empty !!!`
             }) 
@@ -326,7 +327,7 @@ export const increaseCartByOne: RequestHandler = async(req, res, next) => {
           
           if(variation) {
             if (productsIndexes.length === 0) {
-                return res.status(406).json({
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `${product?.name} has not been carted`
                 }) 
@@ -345,7 +346,7 @@ export const increaseCartByOne: RequestHandler = async(req, res, next) => {
             }
             }
             const updatedCart = await cart.save();
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 message: `Cart has been reduced by one !!!`,
                 cart: updatedCart
@@ -353,7 +354,7 @@ export const increaseCartByOne: RequestHandler = async(req, res, next) => {
             };
 
             if (productsIndexes.length === 0) {
-                return res.status(406).json({
+                return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `${product?.name} has not been carted`
                 }) 
@@ -367,7 +368,7 @@ export const increaseCartByOne: RequestHandler = async(req, res, next) => {
           };
 
             const updatedCart = await cart.save();
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 message: `Cart has been reduced by one !!!`,
                 cart: updatedCart
@@ -375,7 +376,7 @@ export const increaseCartByOne: RequestHandler = async(req, res, next) => {
           
          
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })
@@ -393,19 +394,19 @@ export const getCartedProduct: RequestHandler = async(req, res, next) => {
         let {user: {user_id}} = req;
         const cart = await Cart.findOne({customer: user_id});
         if (!cart) {
-            return res.status(406).json({
-                status: `Failed !!!!!`,
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
+                status: `failed`,
                 message: `Cart is empty !!!`
             }) 
         }
-        return res.status(200).json({
-            status: `Success ........`,
+        return res.status(StatusCodes.OK).json({
+            status: `success`,
             message: `Cart successfully loaded .....`,
             cart
         })
     } catch (error: any) {
-        return res.status(500).json({
-            status: `Failed !!!!!!!!!!!!`,
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            status: `failed`,
             message: error.message
         })
     }
@@ -443,14 +444,14 @@ export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
         
 
         if (!cart) {
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 message: `Cart empty !!!`,
             })
         }
 
         if (productIndexes.length === 0) {
-            return res.status(404).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `Product not in cart`,
             })
@@ -466,8 +467,8 @@ export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
                 ) {
                     if (cart.products.length === 1) {
                         await Cart.findOneAndDelete({customer: user_id});
-                        return res.status(200).json({
-                            status: `Success .......`,
+                        return res.status(StatusCodes.OK).json({
+                            status: `success`,
                             message: `Product deleted from cart .......`
                         })
                     }
@@ -476,7 +477,7 @@ export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
                     cart?.products.splice(productIndex, 1);
                     await cart.save();
     
-                    return res.status(200).json({
+                    return res.status(StatusCodes.OK).json({
                         status: `Success .......`,
                         message: `Product deleted from cart .......`,
                         cart
@@ -489,7 +490,7 @@ export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
         for (const productIndex of productIndexes) {
             if (cart.products.length === 1) {
                 await Cart.findOneAndDelete({customer: user_id});
-                return res.status(200).json({
+                return res.status(StatusCodes.OK).json({
                     status: `Success .......`,
                     message: `Product deleted from cart .......`
                 })
@@ -500,7 +501,7 @@ export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
 
             await cart.save();
 
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `Success .......`,
                 message: `Product deleted from cart .......`,
                 cart
@@ -511,13 +512,13 @@ export const deleteProductFromCart: RequestHandler = async(req, res, next) => {
 
         await cart.save();
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `Success .......`,
             message: `Product deleted from cart .......`,
             cart
         })
 } catch (error: any) {
-    res.status(500).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: `Failed !!!!!!!!!!!!`,
         message: error.message
     })
@@ -537,7 +538,7 @@ export const deleteCart: RequestHandler = async(req, res, next) => {
         const cart = await Cart.findOne({customer: user_id});
  
         if (!cart) {
-            return res.status(406).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `Failed !!!!!`,
                 message: `Cart is empty !!!`
             });  
@@ -545,14 +546,14 @@ export const deleteCart: RequestHandler = async(req, res, next) => {
     
         await Cart.findOneAndDelete({customer:user_id});
     
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `Success !!!!!`,
             message: `Cart successfully deleted !!!`
         });  
     } 
 
     catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `Failed !!!`,
             error: error.message
         }) 

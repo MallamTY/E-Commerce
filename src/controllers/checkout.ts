@@ -6,6 +6,7 @@ import Order from "../model/order.model";
 import User from "../model/user.model";
 import https from 'https';
 import { SECRET_KEY } from "../accessories/configuration";
+import { StatusCodes } from "http-status-codes";
 const generateUniqueId = require('generate-unique-id');
 
 export const checkout: RequestHandler = async(req, res, next) => {
@@ -19,7 +20,7 @@ export const checkout: RequestHandler = async(req, res, next) => {
     const user: any = await User.findById(user_id);
 
     if (!(pickup_station || doordelivery)) {
-        return res.status(406).json({
+        return res.status(StatusCodes.EXPECTATION_FAILED).json({
             status: `failed`,
             message: `Delivery method must be specified`
         })
@@ -62,14 +63,14 @@ export const checkout: RequestHandler = async(req, res, next) => {
                 paymentmethod: payment_method
             }) 
             
-            return res.status(200).json({
+            return res.status(StatusCodes.OK).json({
                 status: `success`,
                 order
             })
     }
     else if(doordelivery){
         if (!state) {
-            return res.status(406).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Delivery address must be specified`
             })
@@ -130,14 +131,17 @@ export const checkout: RequestHandler = async(req, res, next) => {
                 
                 order.txref = data.data.reference;
                 await order.save();
-                return res.status(200).json({
+                return res.status(StatusCodes.OK).json({
                     data: JSON.parse(dataStream),
                     order
                 });
 
             })
           }).on('error', (error: any) => {
-            console.error(error)
+            return res.status(StatusCodes.FAILED_DEPENDENCY).json({
+                status: `failed`,
+                message: `An error occurred while trying to get your link`
+            })
           })
           
           reqpaystack.write(params)
@@ -145,7 +149,7 @@ export const checkout: RequestHandler = async(req, res, next) => {
     }
         
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })
@@ -179,13 +183,13 @@ export const verifyPayment: RequestHandler = (req, res, next) => {
             const data = JSON.parse(dataStream);
             
             if (data.status === false) {
-                return res.status(400).json({
+                return res.status(StatusCodes.PAYMENT_REQUIRED).json({
                     status: `failed`,
                     message: `Incomplete transaction`
                 })
             }
             else if (data.data.status === 'abandoned' && data.status === true) {
-                return res.status(404).json({
+                return res.status(StatusCodes.PAYMENT_REQUIRED).json({
                     status: `pending`,
                     message: `This transaction is currently pending, proceed to make payment`
                 })
@@ -204,7 +208,7 @@ export const verifyPayment: RequestHandler = (req, res, next) => {
                 order.paymentmethod = data.data.channel
                 await order.save();
 
-                return res.status(200).json({
+                return res.status(StatusCodes.OK).json({
                     status: `success`,
                     message: `Payment completed and order in process`,
                     
@@ -216,7 +220,7 @@ export const verifyPayment: RequestHandler = (req, res, next) => {
         });
         reqpaystack.end();
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })

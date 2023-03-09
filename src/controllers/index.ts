@@ -12,7 +12,7 @@ import { updateOrder,
         getAllOrder,
         getSingleOrder,
         deleteOrder
-    } from "./orderStateController";
+    } from "./orderController";
 
 import { logIn,
         verifyEmail,

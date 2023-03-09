@@ -3,6 +3,7 @@ import jwt, {JwtPayload} from "jsonwebtoken";
 import { JWT_SECRET } from "../accessories/configuration";
 import { verifyToken } from "../utitlity/token";
 import { payloadJson } from "jsonwebtoken";
+import { StatusCodes } from "http-status-codes";
 
 const Authentication: RequestHandler = (req, res, next) => {
     try {
@@ -15,7 +16,7 @@ const Authentication: RequestHandler = (req, res, next) => {
         type tokenT = string | JwtPayload | tokenType
         let {authorization} = req.headers
         if (!authorization) {
-            return res.status(401).json({
+            return res.status(StatusCodes.NO_CONTENT).json({
                 status: `Failed !!!!!`,
                 message: `Authorization failed`
             })
@@ -23,7 +24,7 @@ const Authentication: RequestHandler = (req, res, next) => {
         const token = authorization.split(' ')[1];
         
         if (!token) {
-            return res.status(401).json({
+            return res.status(StatusCodes.NO_CONTENT).json({
                 status: `Failed !!!!!`,
                 message: `Authorization failed`
             })
@@ -34,7 +35,7 @@ const Authentication: RequestHandler = (req, res, next) => {
         next()
         
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
     })

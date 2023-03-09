@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import { StatusCodes } from "http-status-codes";
 import Favourite from "../model/favourites.model";
 import Product from "../model/product.model";
 
@@ -21,7 +22,7 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
     if(!favourites) {
         const newFavourites = await Favourite.create({customer: user_id, products: product_id})
 
-        return res.status(201).json({
+        return res.status(StatusCodes.CREATED).json({
             status: `success`,
             message: `${product?.name} has been added to your favourite products`,
             favourite: newFavourites
@@ -29,10 +30,10 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
     }
     else if (favourites.products.includes(product_id) && favourites.products.length === 1) {
         await Favourite.findOneAndRemove({customer: user_id})
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `${product?.name} has been removed from your favourite products`,
-            favourites: {}
+            favourites
         }); 
     }
     
@@ -40,7 +41,7 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
         
         favourites.products.push(product_id);
         favourites.save()
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `${product?.name} has been added to your favourite products`,
             favourites
@@ -54,7 +55,7 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
                     favourites.products.splice(productIndex, 1);
 
                     await favourites.save()
-                    return res.status(200).json({
+                    return res.status(StatusCodes.OK).json({
                         status: `success`,
                         message: `${product?.name} has been added to your favourite products`,
                         favourites
@@ -66,13 +67,13 @@ export const addOrRemoveProductToFavourite: RequestHandler = async(req, res, nex
         }
 
         else{
-            return res.status(404).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: `failed`,
                 message: `An error was encountered`
             })
         }
    } catch (error: any) {
-    res.status(500).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: `failed`,
         error: error.message
     })
@@ -91,19 +92,19 @@ try {
 
     const favourite = await Favourite.find({customer: user_id});
     if (favourite.length === 0) {
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `failed`,
             message: `You don't have any product in your favourites list`
         }); 
     }
     
-    return res.status(200).json({
+    return res.status(StatusCodes.OK).json({
         status: `success`,
         message: `Your favourites list has successfully been obtained`,
         favourite
     }); 
 } catch (error: any) {
-    return res.status(500).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: 'failed',
         message: error.message
     })
@@ -121,7 +122,7 @@ try {
     
 
     if(!prodInFavourite) {
-        return res.status(404).json({
+        return res.status(StatusCodes.BAD_REQUEST).json({
             status: `failed`,
             message: `You don't have any favourite list`
         }); 
@@ -130,20 +131,20 @@ try {
     
     if(!prodInFavourite?.products.includes(product_id)) {
 
-    return res.status(404).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
         status: `failed`,
         message: `${product.name} is not on your favourites list`
     }); 
     }
 
 
-    return res.status(200).json({
+    return res.status(StatusCodes.OK).json({
     status: `success`,
     message: `${product.name} found on your favourites list`,
     
     }); 
 } catch (error: any) {
-    return res.status(500).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: `failed`,
         message: error.message
     })
@@ -160,18 +161,18 @@ try {
    const deletedFavourite = await Favourite.findOneAndDelete({customer: user_id});
         
    if(!deletedFavourite) {
-    return res.status(404).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
         status: `failed`,
         message: `Your favourite list is empty !!!`
     }); 
    }
 
-   return res.status(200).json({
+   return res.status(StatusCodes.OK).json({
     status: `success`,
     message: `Your favourites list has been cleared`
     }); 
 } catch (error: any) {
-    res.status(500).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: 'failed',
         message: error.message
     })

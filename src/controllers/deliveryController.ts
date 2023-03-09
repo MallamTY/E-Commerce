@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import Delivery  from '../model/doordelivery.model';
 
 
@@ -10,7 +11,7 @@ export const addDeliveryFee: RequestHandler = async(req, res, next) => {
     } = req;
 
     if (!state) {
-        return res.status(406).json({
+        return res.status(StatusCodes.EXPECTATION_FAILED).json({
             status: 'failed',
             message: `All field must be specified`
         })
@@ -21,21 +22,21 @@ export const addDeliveryFee: RequestHandler = async(req, res, next) => {
     const dbDelivery = await  Delivery.findOne({state});
 
     if (dbDelivery) {
-        return res.status(406).json({
+        return res.status(StatusCodes.CONFLICT).json({
             status: `failed`,
             message: `You already have a delivery detail for ${state}`
         })
     }
 
     const createdDelivery = await Delivery.create({state: joinStataeString, deliveryfee: deliveryFee});
-    return res.status(201).json({
+    return res.status(StatusCodes.CREATED).json({
         status: `success`,
         message: `Delivery record successfully created`,
         deliveryDetails: createdDelivery
     })
     
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })
@@ -49,17 +50,17 @@ export const removeDeliveryFee: RequestHandler = async(req, res, next) => {
         const deleteDelivery = await Delivery.findByIdAndDelete(id);
 
         if (deleteDelivery) {
-            return res.status(406).json({
+            return res.status(StatusCodes.FAILED_DEPENDENCY).json({
                 status: `failed`,
                 message: `Error deleting delivery record`
             })
         }
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Delivery record successfully removed from the database`
         })
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })
@@ -74,7 +75,7 @@ export const updateDeliveryFee: RequestHandler = async(req, res, next) => {
     } = req;
 
         if(!(state || deliveryfee)){
-            return res.status(406).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `Kindly specify the field to update`
             })
@@ -84,19 +85,19 @@ export const updateDeliveryFee: RequestHandler = async(req, res, next) => {
         const joinStataeString = firstLetter+otherLetters;
         const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {state: joinStataeString, deliveryfee}, {new: true});
         if (!dbDelivery) {
-            return res.status(500).json({
+            return res.status(StatusCodes.FAILED_DEPENDENCY).json({
                 status: `failed`,
                 message: `Error updating the record`
             })
         }
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Delivery record successfully updated`,
             delivery: dbDelivery
         })
 
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed`,
             message: error.message
         })

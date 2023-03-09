@@ -5,6 +5,7 @@ import { deleteImage, uploads } from "../utitlity/cloudinary";
 import { sendVerificationLink } from "../utitlity/emailSender";
 import { emailTokenGenerator } from "../utitlity/token";
 import Token from "../model/token.model";
+import { StatusCodes } from "http-status-codes";
 
 
 export type returnTodo = object | null;
@@ -24,25 +25,25 @@ export const registerUser: RequestHandler = async(req, res, next) => {
     reqbody = req.body
     
     if (!(reqbody.firstname && reqbody.lastname && req.body.username && reqbody.email && reqbody.password && reqbody.confirmpassword)) {
-        return res.status(406).json({
+        return res.status(StatusCodes.EXPECTATION_FAILED).json({
             status: `Failed !!!!!`,
             message: `All fields must be fieled`
         })
     }
     if (!validator.isEmail(reqbody.email)) {
-        return res.status(406).json({
+        return res.status(StatusCodes.BAD_REQUEST).json({
             status: `Failed !!!!!`,
             message: `Invalid email address supplied`
         })
     }
     if (!validator.isStrongPassword(reqbody.password) && !validator.isStrongPassword(reqbody.confirmpassword)) {
-        return res.status(406).json({
+        return res.status(StatusCodes.EXPECTATION_FAILED).json({
             status: `Failed !!!!!`,
             message: `Password not strong enough !!!!!`
         })
     }
     if (reqbody.password !== reqbody.confirmpassword) {
-        return res.status(406).json({
+        return res.status(StatusCodes.CONFLICT).json({
             status: `Failed !!!!!`,
             message: `Password not match !!!!`
         })
@@ -51,7 +52,7 @@ export const registerUser: RequestHandler = async(req, res, next) => {
     let dbUser: any = await User.findOne({$or: [{email: reqbody.email.toLowerCase()}, {username: reqbody.username}]});
 
     if (dbUser) {
-        return res.status(404).json({
+        return res.status(StatusCodes.BAD_REQUEST).json({
             status: `Failed !!!!!`,
             message: `User already exist in our database !!!!`
         })
@@ -72,13 +73,13 @@ export const registerUser: RequestHandler = async(req, res, next) => {
     await Token.create({token, user: dbUser._id, expires, type: 'Verification Link'})
     await sendVerificationLink(dbUser.email, dbUser.username, token);
 
-    return res.status(201).json({
+    return res.status(StatusCodes.OK).json({
         status: `success`,
         message: `An email confirmation link has been sent to your email address !!!!`,
     })
     
    } catch (error: any) {
-    return res.status(500).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: `failed `,
         error: error.message
     })
@@ -92,7 +93,7 @@ export const getUser: RequestHandler = async(req, res, next) => {
         const {body: {username, email}} = req;
 
         if (!username && !email) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `User ID is required` 
             })
@@ -107,12 +108,12 @@ export const getUser: RequestHandler = async(req, res, next) => {
         }
         
         if (!dbUser) {
-            return res.status(406).json({
+            return res.status(StatusCodes.NOT_FOUND).json({
                 status: `failed`,
                 message: `User not found` 
             })
         }
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `User found`,
             user: dbUser
@@ -120,7 +121,7 @@ export const getUser: RequestHandler = async(req, res, next) => {
     } 
     
     catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed `,
             error: error.message
         })
@@ -132,19 +133,19 @@ export const getAllUser: RequestHandler = async(req, res, next) => {
         
         const dbUsers = await User.find();
         if (!dbUsers) {
-            return res.status(406).json({
+            return res.status(StatusCodes.NOT_FOUND).json({
                 status: `failed`,
                 message: `No user found` 
             })
         }
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `Users found`,
             user: dbUsers
         })
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed `,
             error: error.message
         })
@@ -157,7 +158,7 @@ export const deleteUser: RequestHandler = async(req, res, next) => {
         const {body: {id}} = req;
 
         if (!id) {
-            return res.status(404).json({
+            return res.status(StatusCodes.EXPECTATION_FAILED).json({
                 status: `failed`,
                 message: `User ID is required` 
             })
@@ -170,18 +171,18 @@ export const deleteUser: RequestHandler = async(req, res, next) => {
 
         const deletedUser = await User.findByIdAndDelete(id);
         if (!deletedUser) {
-            return res.status(406).json({
+            return res.status(StatusCodes.NOT_FOUND).json({
                 status: `failed`,
                 message: `User not found` 
             })
         }
     
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             status: `success`,
             message: `User deleted`
         })
     } catch (error: any) {
-        return res.status(500).json({
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: `failed `,
             error: error.message
         })
