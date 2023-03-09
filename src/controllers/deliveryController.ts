@@ -76,17 +76,17 @@ class DeliverController {
         try {
             
             const {params: {id},
-                    body: {state, deliveryfee}
+                    body: {deliveryfee}
         } = req;
 
-            if(!state && !deliveryfee){
+            if(!deliveryfee){
                 return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `Kindly specify the field to update`
                 })
             }
             
-            if (deliveryfee) {
+            else {
             const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {deliveryfee}, {new: true});
             if (!dbDelivery) {
                 return res.status(StatusCodes.FAILED_DEPENDENCY).json({
@@ -99,31 +99,6 @@ class DeliverController {
                 message: `Delivery record successfully updated`,
                 delivery: dbDelivery
             })
-            }
-
-            else if (state) {
-                const firstLetter = state[0].toUpperCase();
-                const otherLetters = state.slice(1).toLowerCase();
-                const joinStataeString = firstLetter+otherLetters;
-                const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {state: joinStataeString, deliveryfee}, {new: true});
-            }
-            else {
-                const firstLetter = state[0].toUpperCase();
-                const otherLetters = state.slice(1).toLowerCase();
-                const joinStataeString = firstLetter+otherLetters;
-                const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {state: joinStataeString, deliveryfee}, {new: true});
-                if (!dbDelivery) {
-                    return res.status(StatusCodes.FAILED_DEPENDENCY).json({
-                        status: `failed`,
-                        message: `Error updating the record`
-                    })
-                }
-                return res.status(StatusCodes.OK).json({
-                    status: `success`,
-                    message: `Delivery record successfully updated`,
-                    delivery: dbDelivery
-                })
-    
             }
             
         } catch (error: any) {
