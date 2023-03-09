@@ -79,7 +79,7 @@ class DeliverController {
                     body: {state, deliveryfee}
         } = req;
 
-            if(!(state && deliveryfee)){
+            if(!state && !deliveryfee){
                 return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `Kindly specify the field to update`
