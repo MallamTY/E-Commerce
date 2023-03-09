@@ -16,7 +16,7 @@ const Authentication: RequestHandler = (req, res, next) => {
         type tokenT = string | JwtPayload | tokenType
         let {authorization} = req.headers
         if (!authorization) {
-            return res.status(StatusCodes.NO_CONTENT).json({
+            return res.status(StatusCodes.FORBIDDEN).json({
                 status: `Failed !!!!!`,
                 message: `Authorization failed`
             })
@@ -24,7 +24,7 @@ const Authentication: RequestHandler = (req, res, next) => {
         const token = authorization.split(' ')[1];
         
         if (!token) {
-            return res.status(StatusCodes.NO_CONTENT).json({
+            return res.status(StatusCodes.FORBIDDEN).json({
                 status: `Failed !!!!!`,
                 message: `Authorization failed`
             })
@@ -32,7 +32,7 @@ const Authentication: RequestHandler = (req, res, next) => {
      
         const payload = <payloadJson>verifyToken(token);
         req.user = ({...payload})
-        next()
+        next();
         
     } catch (error: any) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
