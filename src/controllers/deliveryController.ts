@@ -54,7 +54,7 @@ class DeliverController {
             
             const deleteDelivery = await Delivery.findByIdAndDelete(id);
 
-            if (deleteDelivery) {
+            if (!deleteDelivery) {
                 return res.status(StatusCodes.FAILED_DEPENDENCY).json({
                     status: `failed`,
                     message: `Error deleting delivery record`
