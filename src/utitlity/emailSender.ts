@@ -49,7 +49,7 @@ export const sendOTP = async(to: string, username: string, otp: string) => {
 
 export const sendVerificationLink = async(to: string, username: string, token: string | undefined) => {
 
-    const url = `http://localhost:7000/ecommerce/v1/auth/verify-email/${token}`;
+    const url = `https://mallamty-ecommerce.herokuapp.com/ecommerce/v1/auth/verify-email/${token}`;
     const subject: string = 'Verification Link';
     const tokenTemplateValues: templateValues = Templates.emailTemplate(url, username);
     const html: string = tokenTemplateValues.html;
