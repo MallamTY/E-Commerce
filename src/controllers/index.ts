@@ -1,57 +1,69 @@
-import { checkout,
-        verifyPayment
-    } from "./checkout";
+import CheckoutController from './checkout';
+
+const checkout = CheckoutController.checkout;
+const verifyPayment = CheckoutController.verifyPayment;
+
+import DeliveryController from './deliveryController';
+
+const addDeliveryFee = DeliveryController.addDeliveryFee
+const removeDeliveryFee = DeliveryController.removeDeliveryFee;
+const updateDeliveryFee = DeliveryController.updateDeliveryFee;
 
 
-import { addDeliveryFee, 
-        removeDeliveryFee, 
-        updateDeliveryFee 
-    } from "./deliveryController";
+import OrderController from "./orderController";
 
-import { updateOrder,
-        getAllOrder,
-        getSingleOrder,
-        deleteOrder
-    } from "./orderController";
+const updateOrder = OrderController.updateOrder;
+const getAllOrder = OrderController.getAllOrder;
+const getSingleOrder = OrderController.getSingleOrder;
+const deleteOrder = OrderController.deleteOrder;
 
-import { logIn,
-        verifyEmail,
-        resendEmailVerificiationLink,
-        verifyOTP,
-        resendOTP,
-        forgetPassword,
-        resetPassword,
-        updateUserProfile,
-        updatedProfilePicture 
-    } from "./authController";
 
-import { cartProduct,
-        decreaseCartByOne,
-        increaseCartByOne,
-        getCartedProduct,
-        deleteProductFromCart,
-        deleteCart
-    } from "./cartController";
+import AuthController from "./authController";
 
-import { addOrRemoveProductToFavourite,
-        getFavourite,
-        checkProductFromFavourite,
-        deleteFavourite,
+const logIn = AuthController.logIn;
+const verifyEmail = AuthController.verifyEmail;
+const resendEmailVerificiationLink = AuthController.resendEmailVerificiationLink;
+const verifyOTP = AuthController.verifyOTP;
+const resendOTP = AuthController.resendOTP;
+const forgetPassword = AuthController.forgetPassword;
+const resetPassword = AuthController.resetPassword;
+const updateUserProfile = AuthController.updateUserProfile;
+const updateProfilePicture = AuthController.updateProfilePicture
 
-    } from "./favouriteController";
 
-import { uploadProduct,
-        updateProduct,
-        getProduct,
-        getAllProduct,
-        deleteProduct
-    } from "./productController";
+import CartController from './cartController';
 
-import { registerUser,
-        getUser,
-        getAllUser,
-        deleteUser
-    } from "./userController";
+const cartProduct = CartController.cartProduct;
+const decreaseCartByOne = CartController.decreaseCartByOne;
+const increaseCartByOne = CartController.increaseCartByOne;
+const getCartedProduct = CartController.getCartedProduct;
+const deleteProductFromCart = CartController.deleteProductFromCart;
+const deleteCart = CartController.deleteCart;
+
+
+import FavouriteController from './favouriteController';
+const addOrRemoveProductToFavourite = FavouriteController.addOrRemoveProductToFavourite
+const getFavourite = FavouriteController.getFavourite;
+const checkProductFromFavourite = FavouriteController.checkProductFromFavourite
+const deleteFavourite = FavouriteController.deleteFavourite;
+
+
+import ProductController from './productController';
+
+const uploadProduct = ProductController.uploadProduct
+const updateProduct = ProductController.updateProduct
+const getProduct = ProductController.getProduct;
+const getAllProduct = ProductController.getAllProduct;
+const deleteProduct = ProductController.deleteProduct;
+
+
+import UserController from './userController';
+
+const registerUser = UserController.registerUser;
+const getUser = UserController.getUser;
+const getAllUser = UserController.getAllUser;
+const deleteUser = UserController.deleteUser;
+
 
 
 
@@ -98,7 +110,7 @@ export const Auth = {
     forgetPassword,
     resetPassword,
     updateUserProfile,
-    updatedProfilePicture
+    updateProfilePicture
 }
 
 export const Cart = {

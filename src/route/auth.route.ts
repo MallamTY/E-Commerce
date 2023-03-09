@@ -19,7 +19,7 @@ router.put('/reset-password/:token', Auth.resetPassword);
 
 router.put('/update-profile', Middlewares.Authentication, Auth.updateUserProfile);
 
-router.put('/update-profile-picture', Middlewares.Authentication, multerUploads, Auth.updatedProfilePicture);
+router.put('/update-profile-picture', Middlewares.Authentication, multerUploads, Auth.updateProfilePicture);
 
 
 export default router;
