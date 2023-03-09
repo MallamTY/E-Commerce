@@ -79,16 +79,15 @@ class DeliverController {
                     body: {state, deliveryfee}
         } = req;
 
-            if(!(state || deliveryfee)){
+            if(!(state && !deliveryfee)){
                 return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `Kindly specify the field to update`
                 })
             }
-            const firstLetter = state[0].toUpperCase();
-            const otherLetters = state.slice(1).toLowerCase();
-            const joinStataeString = firstLetter+otherLetters;
-            const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {state: joinStataeString, deliveryfee}, {new: true});
+            
+            if (deliveryfee) {
+            const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {deliveryfee}, {new: true});
             if (!dbDelivery) {
                 return res.status(StatusCodes.FAILED_DEPENDENCY).json({
                     status: `failed`,
@@ -100,7 +99,33 @@ class DeliverController {
                 message: `Delivery record successfully updated`,
                 delivery: dbDelivery
             })
+            }
 
+            else if (state) {
+                const firstLetter = state[0].toUpperCase();
+                const otherLetters = state.slice(1).toLowerCase();
+                const joinStataeString = firstLetter+otherLetters;
+                const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {state: joinStataeString, deliveryfee}, {new: true});
+            }
+            else {
+                const firstLetter = state[0].toUpperCase();
+                const otherLetters = state.slice(1).toLowerCase();
+                const joinStataeString = firstLetter+otherLetters;
+                const dbDelivery = await Delivery.findByIdAndUpdate({_id: id}, {state: joinStataeString, deliveryfee}, {new: true});
+                if (!dbDelivery) {
+                    return res.status(StatusCodes.FAILED_DEPENDENCY).json({
+                        status: `failed`,
+                        message: `Error updating the record`
+                    })
+                }
+                return res.status(StatusCodes.OK).json({
+                    status: `success`,
+                    message: `Delivery record successfully updated`,
+                    delivery: dbDelivery
+                })
+    
+            }
+            
         } catch (error: any) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                 status: `failed`,
