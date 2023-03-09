@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import { JWT_SECRET } from "../accessories/configuration";
 import { verifyToken } from "../utitlity/token";
 import { payloadJson } from "jsonwebtoken";
 import { StatusCodes } from "http-status-codes";
