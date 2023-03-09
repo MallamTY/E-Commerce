@@ -37,8 +37,7 @@ class FavouriteController {
                 await Favourite.findOneAndRemove({customer: user_id})
                 return res.status(StatusCodes.OK).json({
                     status: `success`,
-                    message: `${product?.name} has been removed from your favourite products`,
-                    favourites
+                    message: `${product?.name} has been removed from your favourite products`
                 }); 
             }
             
