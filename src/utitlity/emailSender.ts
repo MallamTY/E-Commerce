@@ -59,7 +59,7 @@ export const sendVerificationLink = async(to: string, username: string, token: s
 
 export const sendResetPasswordLink = async(to: string, username: string, token: string | undefined) => {
 
-    const url = `http://localhost:7000/ecommerce/v1/auth/reset-password/${token}`;
+    const url = `https://mallamty-ecommerce.herokuapp.com/ecommerce/v1/auth/reset-password/${token}`;
     const subject: string = 'Reset Password';
     const tokenTemplateValues: templateValues = Templates.passwordResetTemplate(url, username);
     const html: string = tokenTemplateValues.html;
