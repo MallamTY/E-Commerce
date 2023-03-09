@@ -12,7 +12,7 @@ class DeliverController {
         try {
             
             const {
-                    body: {state, deliveryFee}        
+                    body: {state, deliveryfee}        
         } = req;
 
         if (!state) {
@@ -33,7 +33,7 @@ class DeliverController {
             })
         }
 
-        const createdDelivery = await Delivery.create({state: joinStataeString, deliveryfee: deliveryFee});
+        const createdDelivery = await Delivery.create({state: joinStataeString, deliveryfee});
         return res.status(StatusCodes.CREATED).json({
             status: `success`,
             message: `Delivery record successfully created`,
