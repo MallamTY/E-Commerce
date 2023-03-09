@@ -4,13 +4,17 @@
   "description": "An ecommerce API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon dest/index.js"
+    "start": "node dist/index.js",
+    "postinstall": "tsc",
+    "watch-node": "nodemon dist/index.js",
+    "watch-ts": "tsc -w"
+  },
+  "engines": {
+    "node": "18.13.0"
   },
   "author": "MallamTY",
   "license": "ISC",
   "dependencies": {
-    "@types/http-status-codes": "^1.2.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
     "cloudinary": "^1.33.0",
@@ -31,6 +35,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.16",
+    "@types/http-status-codes": "^1.2.0",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/morgan": "^1.9.4",
     "@types/multer": "^1.4.7",
