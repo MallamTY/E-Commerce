@@ -6,14 +6,32 @@ import morgan from 'morgan';
 import routes from './route';
 import { StatusCodes } from 'http-status-codes';
 import cors from 'cors';
+import SwaggerUI from 'swagger-ui-express';
+const rateLimiter = require('rate-limiter');
+const xss = require('xss-clean');
+import YAML from 'yamljs';
+
+
+
+const SwaggerDocumentation = YAML.load('./documentation.yaml')
+
+
 
 const app = express();
 app.use(morgan('common'));
 app.use(cors());
+app.use(xss())
 app.use(express.json());
+app.use(rateLimiter({ windowMs: 60 * 1000, max: 60 }))
 app.use(express.urlencoded({extended: true}))
 app.use('/ecommerce/v1', routes);
 
+
+app.get('/', (req, res) => {
+    res.send('<h1>E-Commerce API Developed By MallamTY<h1><a href="/api-documentation">Click here for the API documentation</a>')
+})
+
+app.use('/api-documentation', SwaggerUI.serve, SwaggerUI.setup(SwaggerDocumentation))
 
 class App {
     private port: configType;
