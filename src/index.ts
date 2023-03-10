@@ -5,9 +5,11 @@ import connectDB from './db/dbConnect';
 import morgan from 'morgan';
 import routes from './route';
 import { StatusCodes } from 'http-status-codes';
+import cors from 'cors';
 
 const app = express();
 app.use(morgan('common'));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 app.use('/ecommerce/v1', routes);
