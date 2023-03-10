@@ -1,0 +1,1104 @@
+openapi: 3.0.0
+info:
+  title: E-Commerce Live
+  contact: {}
+  version: '1.0'
+servers:
+- url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+  variables: {}
+- url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+  variables: {}
+paths:
+  /register-user:
+    post:
+      tags:
+      - User
+      summary: Register
+      operationId: Register
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            encoding: {}
+            schema:
+              required:
+              - role
+              - password
+              - confirmpassword
+              - image
+              type: object
+              properties:
+                role:
+                  type: string
+                  example: user
+                password:
+                  type: string
+                  example: Sosanya0.
+                confirmpassword:
+                  type: string
+                  example: Sosanya0.
+                image:
+                  type: string
+                  format: binary
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /get-user:
+    get:
+      tags:
+      - User
+      summary: Get User
+      operationId: GetUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /get-all-user:
+    get:
+      tags:
+      - User
+      summary: Get All User
+      operationId: GetAllUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /delete-user:
+    delete:
+      tags:
+      - User
+      summary: Delete
+      operationId: Delete
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/verify-email/{token}:
+    parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+        description: The token
+    put:
+      tags:
+      - Auth
+      summary: Email Verification
+      operationId: EmailVerification
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/verify-otp/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The user ID
+    post:
+      tags:
+      - Auth
+      summary: Verify OTP
+      operationId: VerifyOTP
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/VerifyOTPRequest'
+              - example:
+                  otp: DHZozSousL
+            example:
+              otp: DHZozSousL
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/resend-otp/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The user ID
+    post:
+      tags:
+      - Auth
+      summary: Resend OTP
+      operationId: ResendOTP
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/forget-password:
+    post:
+      tags:
+      - Auth
+      summary: Forget Password
+      operationId: ForgetPassword
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/ForgetPasswordRequest'
+              - example:
+                  email: tnsosanya@student.oauife.edu.ng
+            example:
+              email: tnsosanya@student.oauife.edu.ng
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/reset-password/{token}:
+    parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+        description: The token
+    put:
+      tags:
+      - Auth
+      summary: Reset Password
+      operationId: ResetPassword
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/ResetPasswordRequest'
+              - example:
+                  newPassword: Sosanya0.
+                  confirmNewPassword: Sosanya0.
+            example:
+              newPassword: Sosanya0.
+              confirmNewPassword: Sosanya0.
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/update-profile:
+    put:
+      tags:
+      - Auth
+      summary: Update Profile
+      operationId: UpdateProfile
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/UpdateProfileRequest'
+              - example:
+                  username: MallamTY
+            example:
+              username: MallamTY
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/update-profile-picture:
+    put:
+      tags:
+      - Auth
+      summary: Update Profile Picture
+      operationId: UpdateProfilePicture
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            encoding: {}
+            schema:
+              required:
+              - image
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login
+      operationId: Login
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/LoginRequest'
+              - example:
+                  username: Aloma
+                  password: Sosanya0.
+            example:
+              username: Aloma
+              password: Sosanya0.
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /product/upload:
+    post:
+      tags:
+      - Product
+      summary: Upload
+      operationId: Upload
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            encoding: {}
+            schema:
+              required:
+              - name
+              - description
+              - price
+              - quantity
+              - ratingsAverage
+              - deliveryfee
+              - images
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Cloth
+                description:
+                  type: string
+                  example: Laptop
+                price:
+                  type: integer
+                  format: int32
+                  example: 50000
+                quantity:
+                  type: integer
+                  format: int32
+                  example: 10
+                ratingsAverage:
+                  type: integer
+                  format: int32
+                  example: 5
+                deliveryfee:
+                  type: integer
+                  format: int32
+                  example: 2000
+                images:
+                  type: string
+                  format: binary
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /product/update/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The Product ID
+    put:
+      tags:
+      - Product
+      summary: Update
+      operationId: Update
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            encoding: {}
+            schema:
+              required:
+              - images
+              type: object
+              properties:
+                images:
+                  type: string
+                  format: binary
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /product/get-single:
+    get:
+      tags:
+      - Product
+      summary: Get Single
+      operationId: GetSingle
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /product/get-all:
+    get:
+      tags:
+      - Product
+      summary: Get All
+      operationId: GetAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /product/delete/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The Product ID
+    delete:
+      tags:
+      - Product
+      summary: Delete
+      operationId: Delete1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /cart/add:
+    post:
+      tags:
+      - Cart
+      summary: Add
+      operationId: Add
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/AddRequest'
+              - example:
+                  product_id: 640a59de1e83492ddfdb048d
+                  quantity: 2
+            example:
+              product_id: 640a59de1e83492ddfdb048d
+              quantity: 2
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /cart/decrease-one:
+    post:
+      tags:
+      - Cart
+      summary: Decrease By One
+      operationId: DecreaseByOne
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/DecreaseByOneRequest'
+              - example:
+                  product_id: 640a526ac848f0fdc89d3a4c
+            example:
+              product_id: 640a526ac848f0fdc89d3a4c
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /cart/increase-one:
+    post:
+      tags:
+      - Cart
+      summary: Increase By One
+      operationId: IncreaseByOne
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/IncreaseByOneRequest'
+              - example:
+                  product_id: 640a526ac848f0fdc89d3a4c
+            example:
+              product_id: 640a526ac848f0fdc89d3a4c
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /cart/get-product:
+    get:
+      tags:
+      - Cart
+      summary: Get Product
+      operationId: GetProduct
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /cart/delete-product:
+    delete:
+      tags:
+      - Cart
+      summary: Delete Carted Product
+      operationId: DeleteCartedProduct
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /cart/delete:
+    delete:
+      tags:
+      - Cart
+      summary: Delete Cart
+      operationId: DeleteCart
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /favourite/add-or-remove:
+    post:
+      tags:
+      - Favourites
+      summary: Add or Remove
+      operationId: AddorRemove
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/AddorRemoveRequest'
+              - example:
+                  product_id: 640a526ac848f0fdc89d3a4c
+            example:
+              product_id: 640a526ac848f0fdc89d3a4c
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /favourite/get:
+    get:
+      tags:
+      - Favourites
+      summary: Get Favourites
+      operationId: GetFavourites
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /favourite/check-product:
+    get:
+      tags:
+      - Favourites
+      summary: Check Product
+      operationId: CheckProduct
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /favourite/delete:
+    delete:
+      tags:
+      - Favourites
+      summary: Delete
+      operationId: Delete2
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/add-delivery:
+    post:
+      tags:
+      - Delivery
+      summary: Add
+      operationId: PostAdd
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/AddRequest1'
+              - example:
+                  state: nassarawa
+                  deliveryfee: 10000
+            example:
+              state: nassarawa
+              deliveryfee: 10000
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/update-delivery/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The Delivery ID
+    put:
+      tags:
+      - Delivery
+      summary: Updated
+      operationId: Updated
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/UpdatedRequest'
+              - example:
+                  deliveryfee: '7500'
+            example:
+              deliveryfee: '7500'
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /auth/remove-delivery/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The Delivery ID
+    delete:
+      tags:
+      - Delivery
+      summary: Delete
+      operationId: Delete3
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /checkout/delivery:
+    post:
+      tags:
+      - Checkout
+      summary: Delivery
+      operationId: Delivery
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /checkout/verify-payment:
+    post:
+      tags:
+      - Checkout
+      summary: Verify Payment
+      operationId: VerifyPayment
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /order/get-single:
+    get:
+      tags:
+      - Order
+      summary: Get SIngle Order
+      operationId: GetSIngleOrder
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /order/get-all:
+    get:
+      tags:
+      - Order
+      summary: Get All Order
+      operationId: GetAllOrder
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /order/update:
+    put:
+      tags:
+      - Order
+      summary: Update Order
+      operationId: UpdateOrder
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/UpdateOrderRequest'
+              - example:
+                  order_id: 640a6f8c12da0b9c504b61ff
+                  status: Delivered
+                  delivered: true
+            example:
+              order_id: 640a6f8c12da0b9c504b61ff
+              status: Delivered
+              delivered: true
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+  /order/delete:
+    delete:
+      tags:
+      - Order
+      summary: Delete
+      operationId: Delete4
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
+components:
+  schemas:
+    DeleteRequest:
+      title: DeleteRequest
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+      example:
+        id: 640a6d7312da0b9c504b61f6
+    VerifyOTPRequest:
+      title: VerifyOTPRequest
+      required:
+      - otp
+      type: object
+      properties:
+        otp:
+          type: string
+      example:
+        otp: DHZozSousL
+    ForgetPasswordRequest:
+      title: ForgetPasswordRequest
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+      example:
+        email: tnsosanya@student.oauife.edu.ng
+    ResetPasswordRequest:
+      title: ResetPasswordRequest
+      required:
+      - newPassword
+      - confirmNewPassword
+      type: object
+      properties:
+        newPassword:
+          type: string
+        confirmNewPassword:
+          type: string
+      example:
+        newPassword: Sosanya0.
+        confirmNewPassword: Sosanya0.
+    UpdateProfileRequest:
+      title: UpdateProfileRequest
+      required:
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+      example:
+        username: MallamTY
+    LoginRequest:
+      title: LoginRequest
+      required:
+      - username
+      - password
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      example:
+        username: Aloma
+        password: Sosanya0.
+    AddRequest:
+      title: AddRequest
+      required:
+      - product_id
+      - quantity
+      type: object
+      properties:
+        product_id:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+      example:
+        product_id: 640a59de1e83492ddfdb048d
+        quantity: 2
+    DecreaseByOneRequest:
+      title: DecreaseByOneRequest
+      required:
+      - product_id
+      type: object
+      properties:
+        product_id:
+          type: string
+      example:
+        product_id: 640a526ac848f0fdc89d3a4c
+    IncreaseByOneRequest:
+      title: IncreaseByOneRequest
+      required:
+      - product_id
+      type: object
+      properties:
+        product_id:
+          type: string
+      example:
+        product_id: 640a526ac848f0fdc89d3a4c
+    DeleteCartedProductRequest:
+      title: DeleteCartedProductRequest
+      required:
+      - product_id
+      type: object
+      properties:
+        product_id:
+          type: string
+      example:
+        product_id: 640a59de1e83492ddfdb048d
+    AddorRemoveRequest:
+      title: AddorRemoveRequest
+      required:
+      - product_id
+      type: object
+      properties:
+        product_id:
+          type: string
+      example:
+        product_id: 640a526ac848f0fdc89d3a4c
+    AddRequest1:
+      title: AddRequest1
+      required:
+      - state
+      - deliveryfee
+      type: object
+      properties:
+        state:
+          type: string
+        deliveryfee:
+          type: integer
+          format: int32
+      example:
+        state: nassarawa
+        deliveryfee: 10000
+    UpdatedRequest:
+      title: UpdatedRequest
+      required:
+      - deliveryfee
+      type: object
+      properties:
+        deliveryfee:
+          type: string
+      example:
+        deliveryfee: '7500'
+    UpdateOrderRequest:
+      title: UpdateOrderRequest
+      required:
+      - order_id
+      - status
+      - delivered
+      type: object
+      properties:
+        order_id:
+          type: string
+        status:
+          type: string
+        delivered:
+          type: boolean
+      example:
+        order_id: 640a6f8c12da0b9c504b61ff
+        status: Delivered
+        delivered: true
+    DeleteRequest1:
+      title: DeleteRequest1
+      required:
+      - order_id
+      type: object
+      properties:
+        order_id:
+          type: string
+      example:
+        order_id: 640a6f8c12da0b9c504b61ff
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+security: []
+tags:
+- name: User
+- name: Auth
+- name: Product
+- name: Cart
+- name: Favourites
+- name: Delivery
+- name: Checkout
+- name: Order
