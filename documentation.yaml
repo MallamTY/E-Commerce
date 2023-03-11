@@ -22,12 +22,28 @@ paths:
             encoding: {}
             schema:
               required:
+              - lastname
+              - firstname
+              - email
+              - username
               - role
               - password
               - confirmpassword
               - image
               type: object
               properties:
+                lastname:
+                  type: string
+                  example: Sosanya
+                firstname:
+                  type: string
+                  example: Idris
+                email:
+                  type: string
+                  example: something@example.com
+                username:
+                  type: string
+                  example: user
                 role:
                   type: string
                   example: user
