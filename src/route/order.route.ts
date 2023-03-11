@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.put('/update', Middlewares.Authentication, Middlewares.adminAuth, Order.updateOrder);
 
-router.get('/get-single', Middlewares. Authentication, Middlewares.adminAuth, Order.getSingleOrder);
+router.post('/get-single', Middlewares. Authentication, Middlewares.adminAuth, Order.getSingleOrder);
 
 router.get('/get-all', Middlewares.Authentication, Middlewares.adminAuth, Order.getAllOrder);
 

@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/register-user', multerUploads, User.registerUser);
 
-router.get('/get-user', Middlewares.Authentication, Middlewares.adminAuth, User.getUser);
+router.post('/get-user', Middlewares.Authentication, Middlewares.adminAuth, User.getUser);
 
 router.delete('/delete-user', Middlewares.Authentication, Middlewares.adminAuth, User.deleteUser);
 
