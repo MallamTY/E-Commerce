@@ -63,7 +63,7 @@ class App {
 
     private home(): void {
         app.get('*', (req, res) => {
-            return res.status(StatusCodes.OK).json(`Welcome to MallamTY E-Commerce Page`);
+            return res.status(StatusCodes.OK).json(`<h1>Welcome to MallamTY E-Commerce Page</h1>`);
         })
     }
 
