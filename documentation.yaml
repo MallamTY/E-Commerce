@@ -140,14 +140,7 @@ paths:
       servers:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
-  /auth/verify-otp/{id}:
-    parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-        description: The user ID
+  /auth/verify-otp:
     post:
       tags:
       - Auth
