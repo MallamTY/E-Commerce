@@ -2,6 +2,7 @@ import CheckoutController from './checkout';
 
 const checkout = CheckoutController.checkout;
 const verifyPayment = CheckoutController.verifyPayment;
+const verifyWebhook = CheckoutController.verifyWebhook;
 
 import DeliveryController from './deliveryController';
 
@@ -92,7 +93,7 @@ export const Product = {
 
 export const Checkout = {
     checkout,
-    verifyPayment
+    verifyPayment, verifyWebhook
 }
 
 export const Delivery = {
