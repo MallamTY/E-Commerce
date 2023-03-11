@@ -80,7 +80,8 @@ class AuthController {
     
             return res.status(StatusCodes.OK).json({
                 status: `success`,
-                message: `A one-time-password has been sent to your registered email address ...`
+                message: `A one-time-password has been sent to your registered email address ...`,
+                user: userDB
             })
             
         
