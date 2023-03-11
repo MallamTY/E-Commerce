@@ -7,11 +7,16 @@ import routes from './route';
 import { StatusCodes } from 'http-status-codes';
 import cors from 'cors';
 import SwaggerUI from 'swagger-ui-express';
-//const rateLimiter = require('rate-limiter');
-const xss = require('xss-clean');
+import rateLimit from 'express-rate-limit';
 import YAML from 'yamljs';
+const xss = require('xss-clean');
 
-
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 100,
+	standardHeaders: true,
+	legacyHeaders: false,
+})
 
 const SwaggerDocumentation = YAML.load('./documentation.yaml')
 
@@ -22,7 +27,7 @@ app.use(morgan('common'));
 app.use(cors());
 app.use(xss())
 app.use(express.json());
-//app.use(rateLimiter({ windowMs: 60 * 1000, max: 60 }))
+app.use(limiter);
 app.use(express.urlencoded({extended: true}))
 app.use('/ecommerce/v1', routes);
 
@@ -47,7 +52,7 @@ class App {
         try {
             const port: configType = PORT || 9000;
             await connectDB(MONGO_URI)
-            app.listen(port,() => console.log(`\neCommerce-API running on port ${port}...`))
+            app.listen(port,() => console.log(`\n eCommerce-API running on port ${port}...`))
                     
          } catch (error: any) {
              console.log(`${error.message} was encountered while trying to connect to the database`);
@@ -58,10 +63,7 @@ class App {
 
     private home(): void {
         app.get('*', (req, res) => {
-            return res.status(StatusCodes.OK).json({
-                status: `success`,
-                messgae: `Welcome to MallamTY E-Commerce Page`
-            })
+            return res.status(StatusCodes.OK).json(`Welcome to MallamTY E-Commerce Page`);
         })
     }
 
