@@ -907,6 +907,8 @@ paths:
           description: ''
           headers: {}
       deprecated: false
+      security:
+      - bearer: []
       servers:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
