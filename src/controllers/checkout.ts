@@ -234,12 +234,13 @@ class CheckoutController {
     }
 
     public verifyWebhook: RequestHandler = (req, res,next) => {
-       // const event = req.body;
-        console.log(req.body);
-        
-        res.send(200)
-        
-    }
+      //try {
+                const event = req.body;
+                console.log(event);
+                res.send(200);
+                
+               
+}
 }
 
 export default new CheckoutController();
