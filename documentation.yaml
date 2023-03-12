@@ -26,7 +26,6 @@ paths:
               - firstname
               - email
               - username
-              - role
               - password
               - confirmpassword
               - image
@@ -159,14 +158,14 @@ paths:
       servers:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
-  /auth/verify-otp/{otp}:
+  /auth/verify-otp/{id}:
     parameters:
       - in: path
-        name: otp
+        name: id
         schema:
           type: string
         required: true
-        description: otp
+        description: User ID
     post:
       tags:
       - Auth

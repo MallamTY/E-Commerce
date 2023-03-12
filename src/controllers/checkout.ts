@@ -233,57 +233,32 @@ class CheckoutController {
         
     }
 
-    public verifyWebhook: RequestHandler = (req, res,next) => {
-        const event = req.body;
-        console.log(event);
-        res.send(200);
-
-    }
-        
-    //   try {
-    //             const event = req.body;
+    public verifyWebhook: RequestHandler = async(req, res,next) => {
+        try {
+            const event = req.body;
+    
+            if (event.data.status === 'success') {
                 
-    //             if (event.data.status === false) {
-    //                 return res.status(StatusCodes.PAYMENT_REQUIRED).json({
-    //                     status: `failed`,
-    //                     message: `Incomplete transaction`
-    //                 })
-    //             }
-    //             else if (data.data.status === 'abandoned' && data.status === true) {
-    //                 return res.status(StatusCodes.PAYMENT_REQUIRED).json({
-    //                     status: `pending`,
-    //                     message: `This transaction is currently pending, proceed to make payment`
-    //                 })
-    //             }
-    //             else if (data.data.status === 'success' && data.status === true) {
-                    
-    //                 const order: any = await Order.findOne({txref: data.data.reference});
-    //                 for (const product of order.product) {
-    //                     const dbProduct: any = await Product.findById(product[0]);
-    //                     const newQuantity = dbProduct?.quantity - product[1];
-    //                     await Product.findByIdAndUpdate({_id: product[0]}, {quantity: newQuantity});
-    //                 }
-    //                 order.status = 'Processing';
-    //                 order.paidFor = true;
-    //                 order.timePaid = data.data.paidAt;
-    //                 order.paymentmethod = data.data.channel
-    //                 await order.save();
-
-    //                 return res.status(StatusCodes.OK).json({
-    //                     status: `success`,
-    //                     message: `Payment completed and order in process`,
-                        
-    //                 })
-    //             }
-          
-    //   } catch (error: any) {
-    //     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-    //         status: `failed`,
-    //         message: error.message
-    //     })
-    //   }
-        
-    // }
+                const order: any = await Order.findOne({txref: event.data.reference});
+                for (const product of order.product) {
+                    const dbProduct: any = await Product.findById(product[0]);
+                    const newQuantity = dbProduct?.quantity - product[1];
+                    await Product.findByIdAndUpdate({_id: product[0]}, {quantity: newQuantity});
+                }
+                order.status = 'Processing';
+                order.paidFor = true;
+                order.timePaid = event.data.paidAt;
+                order.paymentmethod = event.data.channel
+                await order.save();
+            }
+            res.send(200);
+} catch (error: any) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        status: `failed`,
+        message: error.message
+    })
+}
+}
 }
 
 export default new CheckoutController();
