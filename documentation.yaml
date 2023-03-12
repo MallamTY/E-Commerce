@@ -34,16 +34,16 @@ paths:
               properties:
                 lastname:
                   type: string
-                  example: Sosanya
+                  example: Sosanyaewkf
                 firstname:
                   type: string
-                  example: Idris
+                  example: Idriswjkcw
                 email:
                   type: string
-                  example: something@example.com
+                  example: sunday.adesola94@gmail.comm
                 username:
                   type: string
-                  example: username
+                  example: Alomawefh
                 role:
                   type: string
                   example: user
@@ -67,12 +67,24 @@ paths:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
   /get-user:
-    get:
+    post:
       tags:
       - User
       summary: Get User
       operationId: GetUser
       parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/GetUserRequest'
+              - example:
+                  email: sunday.adesola94@gmail.com
+            example:
+              email: sunday.adesola94@gmail.com
+        required: true
       responses:
         '200':
           description: ''
@@ -100,7 +112,14 @@ paths:
       servers:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
-  /delete-user:
+  /delete-user/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The user ID
     delete:
       tags:
       - User
@@ -140,14 +159,14 @@ paths:
       servers:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
-  /auth/verify-otp/{id}:
+  /auth/verify-otp/{otp}:
     parameters:
       - in: path
-        name: id
+        name: otp
         schema:
           type: string
         required: true
-        description: The user ID
+        description: otp
     post:
       tags:
       - Auth
@@ -182,7 +201,7 @@ paths:
         schema:
           type: string
         required: true
-        description: The user ID
+        description: User ID
     post:
       tags:
       - Auth
@@ -233,7 +252,7 @@ paths:
         schema:
           type: string
         required: true
-        description: The token
+        description: token
     put:
       tags:
       - Auth
@@ -376,14 +395,14 @@ paths:
               properties:
                 name:
                   type: string
-                  example: Cloth
+                  example: Clothfhwueofh
                 description:
                   type: string
-                  example: Laptop
+                  example: Laptopfhwoeghe
                 price:
                   type: integer
                   format: int32
-                  example: 50000
+                  example: 500
                 quantity:
                   type: integer
                   format: int32
@@ -417,7 +436,7 @@ paths:
         schema:
           type: string
         required: true
-        description: The Product ID
+        description: Product ID
     put:
       tags:
       - Product
@@ -447,7 +466,14 @@ paths:
       servers:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
-  /product/get-single:
+  /product/get-single/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: id
     get:
       tags:
       - Product
@@ -488,7 +514,7 @@ paths:
         schema:
           type: string
         required: true
-        description: The Product ID
+        description: Product ID
     delete:
       tags:
       - Product
@@ -611,7 +637,14 @@ paths:
       servers:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
-  /cart/delete-product:
+  /cart/delete-product/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: Cart ID
     delete:
       tags:
       - Cart
@@ -692,12 +725,24 @@ paths:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
   /favourite/check-product:
-    get:
+    post:
       tags:
       - Favourites
       summary: Check Product
       operationId: CheckProduct
       parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CheckProductRequest'
+              - example:
+                  product_id: 640a526ac848f0fdc89d3a4c
+            example:
+              product_id: 640a526ac848f0fdc89d3a4c
+        required: true
       responses:
         '200':
           description: ''
@@ -763,7 +808,7 @@ paths:
         schema:
           type: string
         required: true
-        description: The Delivery ID
+        description: Delivery ID
     put:
       tags:
       - Delivery
@@ -799,7 +844,7 @@ paths:
         schema:
           type: string
         required: true
-        description: The Delivery ID
+        description: Delivery ID
     delete:
       tags:
       - Delivery
@@ -823,6 +868,26 @@ paths:
       summary: Delivery
       operationId: Delivery
       parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/DeliveryRequest'
+              - example:
+                  doordelivery: Adam and Eve building, Ile-Ife
+                  state: lagos
+                  contact_person_name: Temitayo Sosanya
+                  contact_person_phone: '123456789'
+                  shipping_method: express
+            example:
+              doordelivery: Adam and Eve building, Ile-Ife
+              state: lagos
+              contact_person_name: Temitayo Sosanya
+              contact_person_phone: '123456789'
+              shipping_method: express
+        required: true
       responses:
         '200':
           description: ''
@@ -830,13 +895,25 @@ paths:
       deprecated: false
       security:
       - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
   /checkout/verify-payment:
     post:
       tags:
       - Checkout
       summary: Verify Payment
       operationId: VerifyPayment
-      parameters: []
+      parameters:
+      - name: txref
+        in: query
+        description: ''
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 00g7xa7fucvwzrzqnhl6
       responses:
         '200':
           description: ''
@@ -844,13 +921,28 @@ paths:
       deprecated: false
       security:
       - bearer: []
+      servers:
+      - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
+        variables: {}
   /order/get-single:
-    get:
+    post:
       tags:
       - Order
       summary: Get SIngle Order
       operationId: GetSIngleOrder
       parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/GetSIngleOrderRequest'
+              - example:
+                  reference: 00g7xa7fucvwzrzqnhl6
+            example:
+              reference: 00g7xa7fucvwzrzqnhl6
+        required: true
       responses:
         '200':
           description: ''
@@ -893,11 +985,11 @@ paths:
               allOf:
               - $ref: '#/components/schemas/UpdateOrderRequest'
               - example:
-                  order_id: 640a6f8c12da0b9c504b61ff
+                  order_id: 640c8832786eae865f1ebb74
                   status: Delivered
                   delivered: true
             example:
-              order_id: 640a6f8c12da0b9c504b61ff
+              order_id: 640c8832786eae865f1ebb74
               status: Delivered
               delivered: true
         required: true
@@ -912,12 +1004,24 @@ paths:
       - url: https://mallamty-ecommerce.herokuapp.com/ecommerce/v1
         variables: {}
   /order/delete:
-    delete:
+    post:
       tags:
       - Order
       summary: Delete
-      operationId: Delete4
+      operationId: PostDelete
       parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/DeleteRequest'
+              - example:
+                  order_id: 640a6f8c12da0b9c504b61ff
+            example:
+              order_id: 640a6f8c12da0b9c504b61ff
+        required: true
       responses:
         '200':
           description: ''
@@ -930,16 +1034,16 @@ paths:
         variables: {}
 components:
   schemas:
-    DeleteRequest:
-      title: DeleteRequest
+    GetUserRequest:
+      title: GetUserRequest
       required:
-      - id
+      - email
       type: object
       properties:
-        id:
+        email:
           type: string
       example:
-        id: 640a6d7312da0b9c504b61f6
+        email: sunday.adesola94@gmail.com
     VerifyOTPRequest:
       title: VerifyOTPRequest
       required:
@@ -1033,8 +1137,8 @@ components:
           type: string
       example:
         product_id: 640a526ac848f0fdc89d3a4c
-    DeleteCartedProductRequest:
-      title: DeleteCartedProductRequest
+    AddorRemoveRequest:
+      title: AddorRemoveRequest
       required:
       - product_id
       type: object
@@ -1042,9 +1146,9 @@ components:
         product_id:
           type: string
       example:
-        product_id: 640a59de1e83492ddfdb048d
-    AddorRemoveRequest:
-      title: AddorRemoveRequest
+        product_id: 640a526ac848f0fdc89d3a4c
+    CheckProductRequest:
+      title: CheckProductRequest
       required:
       - product_id
       type: object
@@ -1078,6 +1182,42 @@ components:
           type: string
       example:
         deliveryfee: '7500'
+    DeliveryRequest:
+      title: DeliveryRequest
+      required:
+      - doordelivery
+      - state
+      - contact_person_name
+      - contact_person_phone
+      - shipping_method
+      type: object
+      properties:
+        doordelivery:
+          type: string
+        state:
+          type: string
+        contact_person_name:
+          type: string
+        contact_person_phone:
+          type: string
+        shipping_method:
+          type: string
+      example:
+        doordelivery: Adam and Eve building, Ile-Ife
+        state: lagos
+        contact_person_name: Temitayo Sosanya
+        contact_person_phone: '123456789'
+        shipping_method: express
+    GetSIngleOrderRequest:
+      title: GetSIngleOrderRequest
+      required:
+      - reference
+      type: object
+      properties:
+        reference:
+          type: string
+      example:
+        reference: 00g7xa7fucvwzrzqnhl6
     UpdateOrderRequest:
       title: UpdateOrderRequest
       required:
@@ -1093,11 +1233,11 @@ components:
         delivered:
           type: boolean
       example:
-        order_id: 640a6f8c12da0b9c504b61ff
+        order_id: 640c8832786eae865f1ebb74
         status: Delivered
         delivered: true
-    DeleteRequest1:
-      title: DeleteRequest1
+    DeleteRequest:
+      title: DeleteRequest
       required:
       - order_id
       type: object

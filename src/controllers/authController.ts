@@ -353,7 +353,6 @@ class AuthController {
                 const user_id = payload.user_id;
                                     
                 const validityCheck: any = await Token.findOne({user: user_id, type: 'Password Reset'});
-                console.log(validityCheck);
                 
     
                 if (!validityCheck) {
