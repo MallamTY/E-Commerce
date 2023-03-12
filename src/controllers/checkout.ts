@@ -236,10 +236,7 @@ class CheckoutController {
     public verifyWebhook: RequestHandler = (req, res,next) => {
         const event = req.body;
 
-        res.status(200).json({
-            status: `success`,
-            message: `Message tested`
-        })
+        res.send(200)
         
     }
 }
