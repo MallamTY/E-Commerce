@@ -10,6 +10,6 @@ router.post('/get-single', Middlewares. Authentication, Middlewares.adminAuth, O
 
 router.get('/get-all', Middlewares.Authentication, Middlewares.adminAuth, Order.getAllOrder);
 
-router.delete('/delete/:id', Middlewares.Authentication, Middlewares.adminAuth, Order.deleteOrder);
+router.post('/delete/', Middlewares.Authentication, Middlewares.adminAuth, Order.deleteOrder);
 
 export default router;
