@@ -236,7 +236,8 @@ class CheckoutController {
     public verifyWebhook: RequestHandler = async(req, res,next) => {
         try {
             const event = req.body;
-    
+            console.log((event));
+            
             if (event.data.status === 'success') {
                 
                 const order: any = await Order.findOne({txref: event.data.reference});
