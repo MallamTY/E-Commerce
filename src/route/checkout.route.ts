@@ -8,7 +8,7 @@ router.post('/delivery', Middlewares.Authentication, Middlewares.buyerAuth, Chec
 
 router.post('/verify-payment', Middlewares.Authentication, Middlewares.buyerAuth, Checkout.verifyPayment);
 
-router.post('https://mallamty-ecommerce.herokuapp.com/ecommerce/v1/webhook', Checkout.verifyWebhook);
+router.post('/verify-webhook', Checkout.verifyWebhook);
 
 
 export default router;
