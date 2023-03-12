@@ -11,6 +11,6 @@ router.delete('/delete', Middlewares.Authentication, Middlewares.buyerAuth, Favo
 
 router.get('/get', Middlewares.Authentication, Middlewares.buyerAuth, Favourite.getFavourite);
 
-router.get('/check-product', Middlewares.Authentication, Middlewares.buyerAuth, Favourite.checkProductFromFavourite);
+router.post('/check-product', Middlewares.Authentication, Middlewares.buyerAuth, Favourite.checkProductFromFavourite);
 
 export default router
