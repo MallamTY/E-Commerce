@@ -29,7 +29,7 @@ class DeliverController {
         if (dbDelivery) {
             return res.status(StatusCodes.CONFLICT).json({
                 status: `failed`,
-                message: `You already have a delivery detail for ${state}`
+                message: `You already have a delivery detail for ${joinStataeString}`
             })
         }
 
