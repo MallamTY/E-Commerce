@@ -162,12 +162,18 @@ class UserController {
 
     public deleteUser: RequestHandler = async(req, res, next) => {
         try {
-            const {params: {id}} = req;
+            const {params: {id}, user: {user_id}} = req;
 
             if (!id) {
                 return res.status(StatusCodes.EXPECTATION_FAILED).json({
                     status: `failed`,
                     message: `User ID is required` 
+                })
+            }
+            if (id === user_id) {
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    status: `failed`,
+                    message: `You can't delete your own account` 
                 })
             }
             
