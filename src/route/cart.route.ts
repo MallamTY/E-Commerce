@@ -16,7 +16,7 @@ router.delete('/delete', Middlewares.Authentication, Middlewares.buyerAuth, Cart
 
 router.get('/get-product', Middlewares.Authentication, Middlewares.buyerAuth, Cart.getCartedProduct);
 
-router.delete('/delete-product', Middlewares.Authentication, Middlewares.buyerAuth, Cart.deleteProductFromCart);
+router.delete('/delete-product/:product_id', Middlewares.Authentication, Middlewares.buyerAuth, Cart.deleteProductFromCart);
 
 
 

@@ -426,7 +426,7 @@ class CartController {
         }
 
         const {user: {user_id},
-                    body: {variation, product_id}    
+                    body: {variation}, params: {product_id}
         } = req;
         
         

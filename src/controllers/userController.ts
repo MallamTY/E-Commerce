@@ -162,7 +162,7 @@ class UserController {
 
     public deleteUser: RequestHandler = async(req, res, next) => {
         try {
-            const {body: {id}} = req;
+            const {params: {id}} = req;
 
             if (!id) {
                 return res.status(StatusCodes.EXPECTATION_FAILED).json({

@@ -176,7 +176,7 @@ class ProductController {
     public getProduct: RequestHandler = async(req, res, next) => {
         
         try {
-            const {body: {id}} = req;
+            const {params: {id}} = req;
 
             if (!id) {
                 return res.status(StatusCodes.BAD_REQUEST).json({
@@ -221,7 +221,7 @@ class ProductController {
 
             return res.status(StatusCodes.OK).json({
                 status: `success`,
-                message: `Users found`,
+                message: `Products found`,
                 user: dbUsers
             })
         }

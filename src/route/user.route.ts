@@ -9,7 +9,7 @@ router.post('/register-user', multerUploads, User.registerUser);
 
 router.post('/get-user', Middlewares.Authentication, Middlewares.adminAuth, User.getUser);
 
-router.delete('/delete-user', Middlewares.Authentication, Middlewares.adminAuth, User.deleteUser);
+router.delete('/delete-user/:id', Middlewares.Authentication, Middlewares.adminAuth, User.deleteUser);
 
 router.get('/get-all-user', Middlewares.Authentication, Middlewares.adminAuth, User.getAllUser);
 
