@@ -24,10 +24,10 @@ class DeliverController {
         const firstLetter = state[0].toUpperCase();
         const otherLetters = state.slice(1).toLowerCase();
         const joinStataeString = firstLetter+otherLetters;
-        const dbDelivery = await  Delivery.findOne({state: state});
+        const dbDelivery = await  Delivery.findOne({state: joinStataeString});
 
         if (dbDelivery) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
+            return res.status(StatusCodes.CONFLICT).json({
                 status: `failed`,
                 message: `You already have a delivery detail for ${state}`
             })
